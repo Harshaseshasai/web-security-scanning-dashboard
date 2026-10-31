@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+pnpm check:conventions && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test
