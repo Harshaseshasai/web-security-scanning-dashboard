@@ -1,16 +1,17 @@
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Copy, ExternalLink, ShieldCheck } from 'lucide-react'
 import { toast } from 'sonner'
-import { useFinding, useTargets } from '../hooks/use-data'
-import { FindingStatusBadge, SeverityBadge } from '../components/ui/Badges'
-import { ErrorState, TableSkeleton } from '../components/ui/DataState'
-import { TRANSITIONS } from '../lib/constants'
-import { FINDING_STATUS_CONFIG } from '../config/status.config'
-import { CONTENT } from '../config/content'
-import { dateLabel } from '../lib/utils'
-import { useFindingStore } from '../store/findings-filter.store'
-import { FindingStatusSchema } from '../schemas/finding.schema'
-import { IconHint } from '../components/ui/Tooltip'
+import { useFinding, useTargets } from '@/hooks/use-data'
+import { FindingStatusBadge, SeverityBadge } from '@/components/ui/Badges'
+import { ErrorState, TableSkeleton } from '@/components/ui/DataState'
+import { TRANSITIONS } from '@/lib/constants'
+import { FINDING_STATUS_CONFIG } from '@/config/status.config'
+import { CONTENT } from '@/config/content'
+import { dateLabel } from '@/lib/utils'
+import { useFindingStore } from '@/store/findings-filter.store'
+import { FindingStatusSchema } from '@/schemas/finding.schema'
+import { IconHint } from '@/components/ui/Tooltip'
+import { Select } from '@/components/ui/Select'
 
 /** Shows HTTP evidence, remediation, and allowed session-only status transitions. */
 export default function FindingDetailPage() {
@@ -123,27 +124,24 @@ export default function FindingDetailPage() {
                   <label className="status-label" htmlFor="finding-status">
                     {CONTENT.findingDetail.changeStatus}
                   </label>
-                  <select
+                  <Select
                     id="finding-status"
-                    className="status-control"
+                    label={CONTENT.findingDetail.changeStatus}
+                    placeholder={CONTENT.findingDetail.chooseStatus}
+                    options={TRANSITIONS[finding.status].map((status) => ({
+                      value: status,
+                      label: FINDING_STATUS_CONFIG[status].label,
+                    }))}
                     value=""
-                    onChange={(event) => {
-                      const next = FindingStatusSchema.parse(event.target.value)
+                    onChange={(value) => {
+                      if (!value) return
+                      const next = FindingStatusSchema.parse(value)
                       if (setStatus(finding.id, finding.status, next))
                         toast.success(
                           `${FINDING_STATUS_CONFIG[next].label}: ${FINDING_STATUS_CONFIG[next].description}`
                         )
                     }}
-                  >
-                    <option value="" disabled>
-                      {CONTENT.findingDetail.chooseStatus}
-                    </option>
-                    {TRANSITIONS[finding.status].map((status) => (
-                      <option key={status} value={status}>
-                        {FINDING_STATUS_CONFIG[status].label}
-                      </option>
-                    ))}
-                  </select>
+                  />
                   <p className="detail-note">{CONTENT.findingDetail.triageHelp}</p>
                 </section>
                 <section className="detail-section">

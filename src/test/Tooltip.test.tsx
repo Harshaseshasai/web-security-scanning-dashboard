@@ -1,8 +1,8 @@
 import { act, renderHook, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { AppRoutes } from '../router'
-import { useCompactNavigation } from '../hooks/use-compact-navigation'
+import { AppRoutes } from '@/router'
+import { useCompactNavigation } from '@/hooks/use-compact-navigation'
 import { renderView, resetStores, seededClient } from './render'
 
 beforeEach(resetStores)

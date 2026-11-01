@@ -1,13 +1,13 @@
 import { BadgeCheck, Check, CircleDot, CircleOff, Clock3, LoaderCircle, X } from 'lucide-react'
-import type { FindingStatus, Scan } from '../../types'
-import type { Severity } from '../../types'
-import { capitalize } from '../../lib/utils'
+import type { FindingStatus, Scan } from '@/types'
+import type { Severity } from '@/types'
+import { capitalize } from '@/lib/utils'
 import {
   FINDING_STATUS_CONFIG,
   SCAN_STATUS_CONFIG,
   type StatusMark,
   type StatusTone,
-} from '../../config/status.config'
+} from '@/config/status.config'
 
 /** Maps a configured status mark to a visible, shape-distinct icon. */
 function StatusIcon({ mark, tone }: { mark: StatusMark; tone: StatusTone }) {

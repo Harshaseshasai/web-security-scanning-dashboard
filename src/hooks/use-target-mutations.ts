@@ -1,9 +1,9 @@
 import { useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CreateTargetSchema, TargetSchema } from '../schemas/target.schema'
-import { SuccessSchema } from '../schemas/auth.schema'
-import { api } from '../lib/api'
-import type { CreateTarget, Target } from '../types'
+import { CreateTargetSchema, TargetSchema } from '@/schemas/target.schema'
+import { SuccessSchema } from '@/schemas/auth.schema'
+import { api } from '@/lib/api'
+import type { CreateTarget, Target } from '@/types'
 
 /** Creates a target with an optimistic cache entry and one idempotency key. */
 export function useCreateTarget() {

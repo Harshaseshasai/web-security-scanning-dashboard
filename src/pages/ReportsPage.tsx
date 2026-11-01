@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Download, Plus, Search } from 'lucide-react'
 import { toast } from 'sonner'
-import { PageHeader } from '../components/layout/PageHeader'
-import { Button } from '../components/ui/Button'
-import { EmptyState, ErrorState, TableSkeleton } from '../components/ui/DataState'
-import { useReports } from '../hooks/use-data'
-import { useUiStore } from '../store/ui.store'
-import { dateLabel } from '../lib/utils'
-import { CONTENT } from '../config/content'
+import { PageHeader } from '@/components/layout/PageHeader'
+import { Button } from '@/components/ui/Button'
+import { EmptyState, ErrorState, TableSkeleton } from '@/components/ui/DataState'
+import { useReports } from '@/hooks/use-data'
+import { useUiStore } from '@/store/ui.store'
+import { dateLabel } from '@/lib/utils'
+import { CONTENT } from '@/config/content'
 
 /** Lists API-provided PDF reports and exposes the assessment's stubbed PDF action. */
 export default function ReportsPage() {

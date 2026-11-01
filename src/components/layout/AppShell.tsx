@@ -2,9 +2,9 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { useIsFetching } from '@tanstack/react-query'
 import { AppSidebar } from './AppSidebar'
 import { AppHeader } from './AppHeader'
-import { useUiStore } from '../../store/ui.store'
+import { useUiStore } from '@/store/ui.store'
 import { GlobalModals } from './GlobalModals'
-import { CONTENT } from '../../config/content'
+import { CONTENT } from '@/config/content'
 
 /** Provides navigation, page landmarks, refresh feedback, and shared workflow dialogs. */
 export function AppShell() {

@@ -2,7 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import { useRef, type ReactNode } from 'react'
 import { IconHint } from './Tooltip'
-import { CONTENT } from '../../config/content'
+import { CONTENT } from '@/config/content'
 
 /** Focus-traps workflow dialogs and returns focus to their original trigger. */
 export function Modal({
@@ -35,9 +35,9 @@ export function Modal({
           className={`modal-content ${wide ? 'modal-wide' : ''}`}
           onOpenAutoFocus={(event) => {
             event.preventDefault()
-            document.querySelector<HTMLElement>('.modal-content[tabindex="-1"]')?.focus()
             returnFocus.current =
               document.activeElement instanceof HTMLElement ? document.activeElement : null
+            document.querySelector<HTMLElement>('.modal-content[tabindex="-1"]')?.focus()
           }}
           onCloseAutoFocus={(event) => {
             event.preventDefault()

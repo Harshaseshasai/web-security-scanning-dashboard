@@ -3,30 +3,30 @@ import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-li
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { QueryClient } from '@tanstack/react-query'
-import DashboardPage from '../pages/DashboardPage'
-import TargetsPage from '../pages/TargetsPage'
-import ScansPage from '../pages/ScansPage'
-import FindingsPage from '../pages/FindingsPage'
-import FindingDetailPage from '../pages/FindingDetailPage'
-import ReportsPage from '../pages/ReportsPage'
-import { ScanForm } from '../components/features/scans/ScanForm'
-import { ReportForm } from '../components/features/reports/ReportForm'
-import { ScansTable } from '../components/features/scans/ScansTable'
-import { GlobalModals } from '../components/layout/GlobalModals'
-import { AppRoutes } from '../router'
-import App from '../App'
-import { useDebounce } from '../hooks/use-debounce'
+import DashboardPage from '@/pages/DashboardPage'
+import TargetsPage from '@/pages/TargetsPage'
+import ScansPage from '@/pages/ScansPage'
+import FindingsPage from '@/pages/FindingsPage'
+import FindingDetailPage from '@/pages/FindingDetailPage'
+import ReportsPage from '@/pages/ReportsPage'
+import { ScanForm } from '@/components/features/scans/ScanForm'
+import { ReportForm } from '@/components/features/reports/ReportForm'
+import { ScansTable } from '@/components/features/scans/ScansTable'
+import { GlobalModals } from '@/components/layout/GlobalModals'
+import { AppRoutes } from '@/router'
+import App from '@/App'
+import { useDebounce } from '@/hooks/use-debounce'
 import { renderView, resetStores, seededClient } from './render'
 import { server } from './setup'
-import { useUiStore } from '../store/ui.store'
-import { scans } from '../mocks/data/scans'
-import { targets } from '../mocks/data/targets'
+import { useUiStore } from '@/store/ui.store'
+import { scans } from '@/mocks/data/scans'
+import { targets } from '@/mocks/data/targets'
 
 beforeEach(resetStores)
 const views = [
   { name: 'targets', element: <TargetsPage />, endpoint: '/api/targets' },
   { name: 'scans', element: <ScansPage />, endpoint: '/api/scans' },
-  { name: 'findings', element: <FindingsPage />, endpoint: '/api/findings/query' },
+  { name: 'findings', element: <FindingsPage />, endpoint: '/api/findings' },
   { name: 'reports', element: <ReportsPage />, endpoint: '/api/reports' },
 ]
 describe('Loading, empty, and persistent error states', () => {
@@ -76,12 +76,34 @@ describe('Loading, empty, and persistent error states', () => {
       http.get('/api/scans', () => HttpResponse.json({ error: 'Scans offline' }, { status: 503 }))
     )
     renderView(<DashboardPage />)
-    expect(screen.getAllByTestId('skeleton-row').length).toBeGreaterThan(0)
+    expect(screen.getByTestId('dashboard-summary-skeleton')).toBeInTheDocument()
+    const chartsSkeleton = screen.getByTestId('dashboard-charts-skeleton')
+    expect(chartsSkeleton).toBeInTheDocument()
+    expect(chartsSkeleton.querySelector('.dashboard-chart-lines')).toBeInTheDocument()
+    expect(chartsSkeleton.querySelector('.dashboard-chart-bars')).not.toBeInTheDocument()
+    expect(screen.getByTestId('dashboard-recent-skeleton')).toBeInTheDocument()
+    expect(
+      screen.getByTestId('dashboard-recent-skeleton').querySelectorAll('thead th')
+    ).toHaveLength(5)
+    const recentSkeleton = screen.getByTestId('dashboard-recent-skeleton')
+    expect(recentSkeleton.querySelectorAll('tbody tr')).toHaveLength(4)
     await screen.findByText('Findings offline')
+    expect(screen.queryByTestId('dashboard-summary-skeleton')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('dashboard-charts-skeleton')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('dashboard-recent-skeleton')).not.toBeInTheDocument()
     const retries = screen.getAllByRole('button', { name: 'Retry' })
     for (const retry of retries) await userEvent.click(retry)
     await userEvent.click(screen.getByRole('tab', { name: 'Activity log' }))
     expect(screen.getByRole('alert')).toHaveTextContent('Scans offline')
+  })
+  it('reveals dashboard regions only after their data is available', () => {
+    renderView(<DashboardPage />, { client: seededClient() })
+    expect(screen.queryByTestId('dashboard-summary-skeleton')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('dashboard-charts-skeleton')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('dashboard-recent-skeleton')).not.toBeInTheDocument()
+    expect(document.querySelector('.risk-summary.reveal')).toBeInTheDocument()
+    expect(document.querySelector('.chart-grid > .reveal')).toBeInTheDocument()
+    expect(document.querySelector('.recent-scans.reveal')).toBeInTheDocument()
   })
   it('offers a first target from an empty dashboard', async () => {
     const client = seededClient()
@@ -147,23 +169,34 @@ describe('Secondary routes and keyboard actions', () => {
     await userEvent.click(screen.getAllByRole('button', { name: /^View scan/ })[0])
     expect(screen.getByRole('dialog')).toHaveTextContent('Analyzing attack surface...')
   })
-  it('handles missing target names in detail and reports', () => {
+  it('handles missing target names in detail and reports', async () => {
     const client = seededClient()
     client.setQueryData(['targets'], [])
     useUiStore.getState().openModal('report')
     renderView(<GlobalModals />, { client })
-    expect(screen.getByLabelText('Completed scan')).toHaveTextContent('Archived target')
+    await userEvent.click(screen.getByRole('combobox', { name: 'Completed scan' }))
+    expect(screen.getAllByRole('option', { name: /Archived target/ }).length).toBeGreaterThan(0)
   })
   it('opens the target modal without an existing target', () => {
     useUiStore.getState().openModal('target')
     renderView(<GlobalModals />, { client: seededClient() })
     expect(screen.getByRole('dialog')).toHaveTextContent('Add target')
   })
+  it('returns focus to the workspace trigger after closing its dialog', async () => {
+    renderView(<AppRoutes />, { route: '/dashboard', client: seededClient() })
+    const trigger = screen.getByRole('button', { name: 'Workspace details' })
+    await userEvent.click(trigger)
+    await userEvent.keyboard('{Escape}')
+    expect(trigger).toHaveFocus()
+  })
   it('uses help, workspace, notifications, and settings navigation actions', async () => {
     renderView(<AppRoutes />, { route: '/dashboard', client: seededClient() })
     await userEvent.click(screen.getByRole('button', { name: 'Help & documentation' }))
     await userEvent.click(screen.getByRole('button', { name: 'Got it' }))
     await userEvent.click(screen.getByRole('button', { name: 'Workspace details' }))
+    const workspaceAvatar = screen.getByRole('dialog').querySelector('.workspace-avatar-modal')
+    expect(workspaceAvatar?.textContent).toBe('DC')
+    expect(workspaceAvatar?.classList.contains('workspace-avatar-modal')).toBe(true)
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
     await userEvent.click(screen.getByRole('button', { name: 'Workspace details' }))
     await userEvent.click(screen.getByRole('button', { name: 'Manage targets' }))

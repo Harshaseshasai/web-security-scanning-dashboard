@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { ArrowRight, LockKeyhole } from 'lucide-react'
-import { Brand, BrandMark } from '../components/layout/Brand'
-import { Button } from '../components/ui/Button'
-import { LoginSchema } from '../schemas/auth.schema'
-import { useAuthConfig, useLogin } from '../hooks/use-auth'
-import { useAuthStore } from '../store/auth.store'
-import { CONTENT } from '../config/content'
+import { Brand, BrandMark } from '@/components/layout/Brand'
+import { Button } from '@/components/ui/Button'
+import { LoginSchema } from '@/schemas/auth.schema'
+import { useAuthConfig, useLogin } from '@/hooks/use-auth'
+import { useAuthStore } from '@/store/auth.store'
+import { CONTENT } from '@/config/content'
 
 /** Validates analyst credentials, then delegates authentication to the API-backed hook. */
 export default function LoginPage() {

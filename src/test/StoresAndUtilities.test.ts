@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useFindingStore } from '../store/findings-filter.store'
-import { useAuthStore } from '../store/auth.store'
-import { useThemeStore } from '../store/theme.store'
-import { useUiStore } from '../store/ui.store'
-import { TRANSITIONS } from '../lib/constants'
+import { useFindingStore } from '@/store/findings-filter.store'
+import { useAuthStore } from '@/store/auth.store'
+import { useThemeStore } from '@/store/theme.store'
+import { useUiStore } from '@/store/ui.store'
+import { TRANSITIONS } from '@/lib/constants'
 import {
   capitalize,
   cn,
@@ -12,9 +12,9 @@ import {
   formatDuration,
   hostname,
   relativeTime,
-} from '../lib/utils'
-import { findingsCsv, downloadFile } from '../lib/download'
-import { findings } from '../mocks/data/findings'
+} from '@/lib/utils'
+import { findingsCsv, downloadFile } from '@/lib/download'
+import { findings } from '@/mocks/data/findings'
 import { resetStores } from './render'
 
 beforeEach(resetStores)

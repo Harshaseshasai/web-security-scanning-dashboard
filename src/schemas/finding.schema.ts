@@ -34,16 +34,6 @@ export const FilterSchema = z
   })
   .strict()
 
-/** The paginated response from GET /api/findings/query. */
-export const FindingQueryResponseSchema = z
-  .object({
-    items: z.array(FindingSchema),
-    total: z.number().int().min(0),
-    page: z.number().int().min(1),
-    pageSize: z.number().int().min(1),
-  })
-  .strict()
-
 export type Finding = z.infer<typeof FindingSchema>
 export type Severity = z.infer<typeof SeveritySchema>
 export type FindingStatus = z.infer<typeof FindingStatusSchema>

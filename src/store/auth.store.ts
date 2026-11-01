@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import { SessionSchema } from '../schemas/auth.schema'
-import type { Session } from '../types'
+import { SessionSchema } from '@/schemas/auth.schema'
+import type { Session } from '@/types'
 
 /** Restores a validated tab session; first-time visitors must sign in to the demo. */
 function initialSession(): Session | null {

@@ -329,6 +329,11 @@ h3 {
   font-weight: 600;
   font-size: 13px;
 }
+.workspace-avatar-modal {
+  color: var(--foreground);
+  background: var(--secondary);
+  border-color: var(--border);
+}
 .workspace-info {
   flex: 1;
   font-size: 12px;
@@ -696,6 +701,7 @@ kbd {
 .tab-counter {
   margin-left: 6px;
   background: var(--secondary);
+  color: color-mix(in oklch, var(--muted-foreground) 90%, var(--foreground));
   border-radius: 4px;
   padding: 1px 5px;
   font-family: var(--font-code);
@@ -1355,6 +1361,40 @@ kbd {
   margin-top: 5px;
   color: var(--muted-foreground);
 }
+.select-trigger-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+.select-popover {
+  min-width: 200px;
+  max-width: 320px;
+}
+.select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px;
+  font-size: 11px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  color: inherit;
+}
+.select-option:hover {
+  background: var(--secondary);
+}
+.select-option.selected {
+  background: var(--secondary);
+}
 .sort-button {
   display: inline-flex;
   align-items: center;
@@ -1430,14 +1470,260 @@ kbd {
   height: 12px;
   width: 64%;
   border-radius: 3px;
-  background: var(--secondary);
-  animation: skeleton 280ms ease-in-out alternate infinite;
+  background: color-mix(in oklch, var(--muted-foreground) 30%, var(--background));
+  animation: skeleton 900ms ease-in-out alternate infinite;
 }
 .skeleton-long {
   width: 88%;
 }
 .skeleton-table td {
   height: 48px;
+}
+.dashboard-summary-skeleton .risk-lead,
+.dashboard-summary-skeleton .supporting-metrics {
+  justify-content: space-between;
+}
+.dashboard-summary-skeleton .dashboard-summary-eyebrow {
+  width: 148px;
+}
+.dashboard-summary-affected {
+  width: 105px;
+}
+.dashboard-summary-skeleton .dashboard-summary-critical {
+  width: 58px;
+  height: 55px;
+}
+.dashboard-summary-context {
+  display: grid;
+  width: min(250px, 60%);
+  gap: 8px;
+}
+.dashboard-summary-context-title {
+  width: 84%;
+  height: 14px;
+}
+.dashboard-summary-context-copy {
+  width: 100%;
+}
+.dashboard-summary-finding {
+  margin-top: 18px;
+}
+.dashboard-summary-finding-label {
+  width: 72px;
+}
+.dashboard-summary-finding-title {
+  width: min(100%, 300px);
+}
+.dashboard-summary-finding-target {
+  grid-column: 2;
+  width: 42%;
+  margin-top: 3px;
+}
+.dashboard-summary-link {
+  width: 105px;
+  margin-top: auto;
+}
+.dashboard-summary-label {
+  width: 78px;
+}
+.dashboard-summary-primary-number {
+  width: 72px;
+  height: 38px;
+  margin-top: 8px;
+}
+.dashboard-summary-number {
+  width: 48px;
+  height: 29px;
+  margin-top: 8px;
+}
+.dashboard-summary-note {
+  width: 110px;
+  margin-top: 7px;
+}
+.dashboard-chart-placeholder-heading {
+  display: grid;
+  width: min(260px, 75%);
+  gap: 8px;
+}
+.dashboard-panel-title {
+  width: 125px;
+  height: 14px;
+}
+.dashboard-panel-description {
+  width: 88%;
+}
+.dashboard-period-control {
+  width: 92px;
+  height: 28px;
+}
+.dashboard-legend-swatch {
+  width: 14px;
+  height: 3px;
+}
+.dashboard-legend-label {
+  width: 62px;
+}
+.dashboard-chart-plot {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  height: 203px;
+  margin: 8px 20px 0 15px;
+  gap: 8px;
+}
+.dashboard-chart-y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 22px;
+}
+.dashboard-chart-y-label {
+  width: 12px;
+  height: 6px;
+}
+.dashboard-chart-graph {
+  position: relative;
+  min-width: 0;
+  height: 100%;
+}
+.dashboard-chart-guides {
+  position: absolute;
+  inset: 0 0 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.dashboard-chart-guides span {
+  border-top: 1px dashed var(--border);
+}
+.dashboard-chart-lines {
+  position: absolute;
+  inset: 0 0 22px;
+  width: 100%;
+  height: calc(100% - 22px);
+}
+.dashboard-chart-lines polyline {
+  fill: none;
+  stroke: var(--muted-foreground);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+  opacity: 0.42;
+}
+.dashboard-chart-lines polyline + polyline {
+  stroke-dasharray: 8 10;
+  opacity: 0.28;
+}
+.dashboard-chart-x-axis {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  justify-content: space-between;
+}
+.dashboard-chart-x-label {
+  width: 27px;
+  height: 6px;
+}
+.dashboard-chart-footer {
+  width: 185px;
+}
+.dashboard-severity-placeholder .severity-bars {
+  padding: 20px 20px 22px;
+}
+.dashboard-severity-total {
+  width: 43px;
+  height: 29px;
+  margin-bottom: 20px;
+}
+.dashboard-severity-placeholder .severity-bar-row {
+  align-items: center;
+}
+.dashboard-severity-label {
+  width: 46px;
+  height: 8px;
+}
+.dashboard-severity-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+}
+.dashboard-severity-fill {
+  width: 52%;
+  height: 5px;
+}
+.dashboard-severity-count {
+  width: 20px;
+}
+.dashboard-severity-footer {
+  padding: 11px 20px;
+  border-top: 1px solid var(--border);
+}
+.dashboard-severity-footer .skeleton {
+  width: 90px;
+  margin: auto;
+}
+.dashboard-region-skeleton .panel-heading {
+  padding-bottom: 17px;
+}
+.dashboard-recent-link {
+  width: 92px;
+}
+.dashboard-scan-skeleton th,
+.dashboard-scan-skeleton td {
+  height: 48px;
+}
+.dashboard-scan-skeleton .dashboard-scan-heading {
+  width: 58px;
+  height: 7px;
+}
+.dashboard-scan-target {
+  width: 112px;
+  height: 8px;
+}
+.dashboard-scan-host {
+  width: 84px;
+  height: 6px;
+  margin-top: 6px;
+}
+.dashboard-scan-status {
+  width: 54px;
+}
+.dashboard-scan-findings {
+  width: 108px;
+}
+.dashboard-scan-started {
+  width: 66px;
+}
+.dashboard-scan-duration {
+  width: 42px;
+}
+.dashboard-activity-skeleton .panel-heading {
+  padding-bottom: 18px;
+}
+.dashboard-activity-copy {
+  display: grid;
+  width: min(55%, 340px);
+  gap: 8px;
+}
+.dashboard-activity-title {
+  width: 84%;
+}
+.dashboard-activity-detail {
+  width: 55%;
+}
+.dashboard-activity-time {
+  width: 72px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+@media (forced-colors: active) {
+  .skeleton {
+    background: Canvas;
+    border: 1px solid CanvasText;
+    animation: none;
+  }
 }
 .error-state {
   display: flex;
@@ -2003,7 +2289,7 @@ kbd {
 }
 @keyframes skeleton {
   from {
-    opacity: 0.6;
+    opacity: 0.78;
   }
   to {
     opacity: 1;
@@ -2251,6 +2537,16 @@ kbd {
   }
   .tabs {
     gap: 20px;
+  }
+  .tabs-findings {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+  }
+  .tabs-findings .tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
   .toolbar {
     gap: 7px;

@@ -2,17 +2,23 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import * as Popover from '@radix-ui/react-popover'
 import { CalendarDays, Check, ChevronDown, ScanLine } from 'lucide-react'
-import { PageHeader } from '../components/layout/PageHeader'
-import { Button } from '../components/ui/Button'
-import { EmptyState, ErrorState, TableSkeleton } from '../components/ui/DataState'
-import { Reveal } from '../components/ui/Reveal'
-import { useFindings, useScans, useTargets } from '../hooks/use-data'
-import { useUiStore } from '../store/ui.store'
-import { FindingsChart } from '../components/features/dashboard/FindingsChart'
-import { ScansTable } from '../components/features/scans/ScansTable'
-import { SeveritySchema } from '../schemas/finding.schema'
-import { capitalize, relativeTime } from '../lib/utils'
-import { CONTENT } from '../config/content'
+import { PageHeader } from '@/components/layout/PageHeader'
+import { Button } from '@/components/ui/Button'
+import { EmptyState, ErrorState } from '@/components/ui/DataState'
+import { Reveal } from '@/components/ui/Reveal'
+import {
+  DashboardActivitySkeleton,
+  DashboardChartsSkeleton,
+  DashboardRecentScansSkeleton,
+  DashboardSummarySkeleton,
+} from '@/components/features/dashboard/DashboardSkeleton'
+import { useFindings, useScans, useTargets } from '@/hooks/use-data'
+import { useUiStore } from '@/store/ui.store'
+import { FindingsChart } from '@/components/features/dashboard/FindingsChart'
+import { ScansTable } from '@/components/features/scans/ScansTable'
+import { SeveritySchema } from '@/schemas/finding.schema'
+import { capitalize, relativeTime } from '@/lib/utils'
+import { CONTENT } from '@/config/content'
 
 /** Reconciles targets, findings, and scans into the overview and activity log. */
 export default function DashboardPage() {
@@ -35,6 +41,13 @@ export default function DashboardPage() {
   const focusTarget = targets.data?.find((target) => target.id === oldestCritical?.targetId)
   const active =
     scans.data?.filter((scan) => ['running', 'queued'].includes(scan.status)).length ?? 0
+  const summaryLoading = targets.isLoading || scans.isLoading || findings.isLoading
+  const summaryError = targets.isError || scans.isError || findings.isError
+  const retrySummary = () => {
+    void targets.refetch()
+    void scans.refetch()
+    void findings.refetch()
+  }
   return (
     <>
       <PageHeader
@@ -116,100 +129,86 @@ export default function DashboardPage() {
       </div>
       {tab === 'overview' ? (
         <>
-          <section className="risk-summary" aria-label={CONTENT.dashboard.priorityRegion}>
-            <div className="risk-lead">
-              <div className="risk-topline">
-                <span>{CONTENT.dashboard.priorityLabel}</span>
-                <span className="mono muted">
-                  {findings.data
-                    ? `${affectedTargets} ${CONTENT.dashboard.targetsAffected}`
-                    : CONTENT.dashboard.loadingFindings}
-                </span>
-              </div>
-              <div className="risk-measure">
-                <div className="risk-number">
-                  {findings.data ? critical : <div className="skeleton risk-skeleton" />}
+          {summaryError ? (
+            <Reveal className="dashboard-summary-error">
+              <ErrorState
+                error={findings.error ?? targets.error ?? scans.error}
+                retry={retrySummary}
+              />
+            </Reveal>
+          ) : summaryLoading ? (
+            <DashboardSummarySkeleton />
+          ) : (
+            <Reveal className="risk-summary" aria-label={CONTENT.dashboard.priorityRegion}>
+              <div className="risk-lead">
+                <div className="risk-topline">
+                  <span>{CONTENT.dashboard.priorityLabel}</span>
+                  <span className="mono muted">
+                    {`${affectedTargets} ${CONTENT.dashboard.targetsAffected}`}
+                  </span>
                 </div>
-                <div className="risk-context">
-                  <h2>{CONTENT.dashboard.priorityHeading}</h2>
-                  <p>
-                    {!findings.data
-                      ? CONTENT.dashboard.priorityLoading
-                      : critical > 0
+                <div className="risk-measure">
+                  <div className="risk-number">{critical}</div>
+                  <div className="risk-context">
+                    <h2>{CONTENT.dashboard.priorityHeading}</h2>
+                    <p>
+                      {critical > 0
                         ? CONTENT.dashboard.priorityPrompt
                         : CONTENT.dashboard.priorityClear}
-                  </p>
+                    </p>
+                  </div>
+                </div>
+                {oldestCritical && (
+                  <Link className="risk-first" to={`/findings/${oldestCritical.id}`}>
+                    <span>{CONTENT.dashboard.oldestFinding}</span>
+                    <strong>{oldestCritical.title}</strong>
+                    <span className="mono muted">
+                      {focusTarget?.name ?? oldestCritical.targetId} / {oldestCritical.cwe}
+                    </span>
+                  </Link>
+                )}
+                <Link
+                  className="risk-link"
+                  to={
+                    critical > 0 ? '/findings?severity=critical&status=open,confirmed' : '/findings'
+                  }
+                >
+                  {critical > 0 ? CONTENT.dashboard.reviewCritical : CONTENT.dashboard.reviewAll}
+                </Link>
+              </div>
+              <div className="supporting-metrics">
+                <Link
+                  className="support-metric support-primary"
+                  to="/findings?status=open,confirmed"
+                >
+                  <span className="support-label">{CONTENT.dashboard.openFindings}</span>
+                  <strong className="support-number">{open?.length ?? 0}</strong>
+                  <span className="support-note">{CONTENT.dashboard.openFindingsNote}</span>
+                </Link>
+                <div className="support-metric-pair">
+                  <Link className="support-metric" to="/scans">
+                    <span className="support-label">{CONTENT.dashboard.scansRun}</span>
+                    <strong className="support-number">{scans.data?.length ?? 0}</strong>
+                    <span className="support-note">
+                      {`${active} ${CONTENT.dashboard.scansActive}`}
+                    </span>
+                  </Link>
+                  <Link className="support-metric" to="/targets">
+                    <span className="support-label">{CONTENT.dashboard.targets}</span>
+                    <strong className="support-number">{targets.data?.length ?? 0}</strong>
+                    <span className="support-note">
+                      {`${new Set(targets.data?.map((target) => target.environment)).size} ${CONTENT.dashboard.targetsEnvironments}`}
+                    </span>
+                  </Link>
                 </div>
               </div>
-              {oldestCritical && (
-                <Link className="risk-first" to={`/findings/${oldestCritical.id}`}>
-                  <span>{CONTENT.dashboard.oldestFinding}</span>
-                  <strong>{oldestCritical.title}</strong>
-                  <span className="mono muted">
-                    {focusTarget?.name ?? oldestCritical.targetId} / {oldestCritical.cwe}
-                  </span>
-                </Link>
-              )}
-              <Link
-                className="risk-link"
-                to={
-                  critical > 0 ? '/findings?severity=critical&status=open,confirmed' : '/findings'
-                }
-              >
-                {critical > 0 ? CONTENT.dashboard.reviewCritical : CONTENT.dashboard.reviewAll}
-              </Link>
-            </div>
-            <div className="supporting-metrics">
-              <Link className="support-metric support-primary" to="/findings?status=open,confirmed">
-                <span className="support-label">{CONTENT.dashboard.openFindings}</span>
-                <strong className="support-number">
-                  {open?.length ?? <span className="skeleton" />}
-                </strong>
-                <span className="support-note">{CONTENT.dashboard.openFindingsNote}</span>
-              </Link>
-              <div className="support-metric-pair">
-                <Link className="support-metric" to="/scans">
-                  <span className="support-label">{CONTENT.dashboard.scansRun}</span>
-                  <strong className="support-number">
-                    {scans.data?.length ?? <span className="skeleton" />}
-                  </strong>
-                  <span className="support-note">
-                    {scans.data
-                      ? `${active} ${CONTENT.dashboard.scansActive}`
-                      : CONTENT.dashboard.loadingScans}
-                  </span>
-                </Link>
-                <Link className="support-metric" to="/targets">
-                  <span className="support-label">{CONTENT.dashboard.targets}</span>
-                  <strong className="support-number">
-                    {targets.data?.length ?? <span className="skeleton" />}
-                  </strong>
-                  <span className="support-note">
-                    {targets.data
-                      ? `${new Set(targets.data.map((target) => target.environment)).size} ${CONTENT.dashboard.targetsEnvironments}`
-                      : CONTENT.dashboard.loadingTargets}
-                  </span>
-                </Link>
-              </div>
-            </div>
-          </section>
-          {(targets.isError || scans.isError) && (
-            <ErrorState
-              error={targets.error ?? scans.error}
-              retry={() => {
-                void targets.refetch()
-                void scans.refetch()
-              }}
-            />
+            </Reveal>
           )}
-          {findings.isError ? (
-            <ErrorState error={findings.error} retry={() => void findings.refetch()} />
-          ) : findings.isLoading ? (
-            <div className="panel" style={{ marginBottom: 23 }}>
-              <TableSkeleton rows={5} />
-            </div>
-          ) : findings.data === undefined || findings.data.length === 0 ? (
-            <div className="panel">
+          {findings.isLoading ? (
+            <DashboardChartsSkeleton />
+          ) : findings.isError ? null : findings.data === undefined ||
+            findings.data.length === 0 ? (
+            <Reveal className="panel">
               <EmptyState
                 title={CONTENT.dashboard.noFindingsTitle}
                 description={CONTENT.dashboard.noFindingsDescription}
@@ -218,7 +217,7 @@ export default function DashboardPage() {
                   openModal('target')
                 }}
               />
-            </div>
+            </Reveal>
           ) : (
             <div className="chart-grid">
               <FindingsChart findings={findings.data} days={days} setDays={setDays} />
@@ -267,38 +266,52 @@ export default function DashboardPage() {
               </Reveal>
             </div>
           )}
-          <Reveal className="panel recent-scans">
-            <div className="panel-heading">
-              <div>
-                <h2>{CONTENT.dashboard.recentScans}</h2>
-                <p>{CONTENT.dashboard.recentScansDescription}</p>
+          {scans.isLoading || targets.isLoading ? (
+            <DashboardRecentScansSkeleton />
+          ) : (
+            <Reveal className="panel recent-scans">
+              <div className="panel-heading">
+                <div>
+                  <h2>{CONTENT.dashboard.recentScans}</h2>
+                  <p>{CONTENT.dashboard.recentScansDescription}</p>
+                </div>
+                <Link to="/scans" className="section-link">
+                  {CONTENT.dashboard.viewAllScans}
+                </Link>
               </div>
-              <Link to="/scans" className="section-link">
-                {CONTENT.dashboard.viewAllScans}
-              </Link>
-            </div>
-            {scans.isLoading || targets.isLoading ? (
-              <TableSkeleton rows={4} />
-            ) : scans.isError ? (
-              <ErrorState error={scans.error} retry={() => void scans.refetch()} />
-            ) : (
-              <ScansTable
-                scans={scans.data?.slice(0, 4) ?? []}
-                targets={targets.data ?? []}
-                compact
-              />
-            )}
-          </Reveal>
+              {scans.isError || targets.isError ? (
+                <ErrorState
+                  error={scans.error ?? targets.error}
+                  retry={() => {
+                    void scans.refetch()
+                    void targets.refetch()
+                  }}
+                />
+              ) : (
+                <ScansTable
+                  scans={scans.data?.slice(0, 4) ?? []}
+                  targets={targets.data ?? []}
+                  compact
+                />
+              )}
+            </Reveal>
+          )}
         </>
+      ) : scans.isLoading || targets.isLoading ? (
+        <DashboardActivitySkeleton />
       ) : (
         <Reveal className="panel">
           <div className="panel-heading" style={{ paddingBottom: 18 }}>
             <h2>{CONTENT.dashboard.activityTitle}</h2>
           </div>
-          {scans.isLoading ? (
-            <TableSkeleton rows={8} />
-          ) : scans.isError ? (
-            <ErrorState error={scans.error} retry={() => void scans.refetch()} />
+          {scans.isError || targets.isError ? (
+            <ErrorState
+              error={scans.error ?? targets.error}
+              retry={() => {
+                void scans.refetch()
+                void targets.refetch()
+              }}
+            />
           ) : (
             scans.data?.map((scan) => (
               <Link className="activity-item" key={scan.id} to={`/scans?scan=${scan.id}`}>

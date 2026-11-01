@@ -1,19 +1,19 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { ArrowRight, TriangleAlert, LogOut, Moon, ScanLine, Sun } from 'lucide-react'
-import { Modal } from '../ui/Modal'
-import { Button } from '../ui/Button'
-import { TargetForm } from '../features/targets/TargetForm'
-import { ScanForm } from '../features/scans/ScanForm'
-import { ReportForm } from '../features/reports/ReportForm'
-import { useUiStore } from '../../store/ui.store'
-import { useThemeStore } from '../../store/theme.store'
-import { useAuthStore } from '../../store/auth.store'
-import { useFindingStore } from '../../store/findings-filter.store'
-import { useFindings, useScans, useTargets } from '../../hooks/use-data'
-import { useWorkspace } from '../../hooks/use-auth'
-import { CONTENT } from '../../config/content'
-import { initials } from '../../lib/utils'
+import { Modal } from '@/components/ui/Modal'
+import { Button } from '@/components/ui/Button'
+import { TargetForm } from '@/components/features/targets/TargetForm'
+import { ScanForm } from '@/components/features/scans/ScanForm'
+import { ReportForm } from '@/components/features/reports/ReportForm'
+import { useUiStore } from '@/store/ui.store'
+import { useThemeStore } from '@/store/theme.store'
+import { useAuthStore } from '@/store/auth.store'
+import { useFindingStore } from '@/store/findings-filter.store'
+import { useFindings, useScans, useTargets } from '@/hooks/use-data'
+import { useWorkspace } from '@/hooks/use-auth'
+import { CONTENT } from '@/config/content'
+import { initials } from '@/lib/utils'
 
 /** Hosts mutually exclusive target, scan, report, and workspace dialogs. */
 export function GlobalModals() {
@@ -194,7 +194,9 @@ export function GlobalModals() {
               <h3>{workspaceName}</h3>
               <p>{workspace.data?.plan ?? CONTENT.navigation.workspaceLoading}</p>
             </div>
-            <span className="workspace-avatar">{initials(workspaceName)}</span>
+            <span className="workspace-avatar workspace-avatar-modal" aria-hidden="true">
+              {initials(workspaceName)}
+            </span>
           </div>
           <div className="help-section">
             <h3>{CONTENT.workspace.details}</h3>

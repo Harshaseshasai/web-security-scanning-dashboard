@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FindingsTable } from '../components/features/findings/FindingsTable'
-import { findings } from '../mocks/data/findings'
-import { targets } from '../mocks/data/targets'
-import { FilterSchema } from '../schemas/finding.schema'
+import { FindingsTable } from '@/components/features/findings/FindingsTable'
+import { findings } from '@/mocks/data/findings'
+import { targets } from '@/mocks/data/targets'
+import { FilterSchema } from '@/schemas/finding.schema'
 import { renderView, resetStores } from './render'
 
 beforeEach(resetStores)

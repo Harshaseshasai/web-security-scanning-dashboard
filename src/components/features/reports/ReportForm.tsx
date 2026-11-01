@@ -2,19 +2,21 @@ import { useRef, useState, type FormEvent } from 'react'
 import { FileCheck2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { useScans, useTargets } from '../../../hooks/use-data'
-import { useGenerateReport } from '../../../hooks/use-report-mutations'
-import { CreateReportSchema } from '../../../schemas/report.schema'
-import { Button } from '../../ui/Button'
-import { EmptyState, ErrorState, TableSkeleton } from '../../ui/DataState'
-import { useUiStore } from '../../../store/ui.store'
-import { CONTENT } from '../../../config/content'
+import { useScans, useTargets } from '@/hooks/use-data'
+import { useGenerateReport } from '@/hooks/use-report-mutations'
+import { CreateReportSchema } from '@/schemas/report.schema'
+import { Button } from '@/components/ui/Button'
+import { EmptyState, ErrorState, TableSkeleton } from '@/components/ui/DataState'
+import { useUiStore } from '@/store/ui.store'
+import { CONTENT } from '@/config/content'
+import { Select } from '@/components/ui/Select'
 
 /** Requires a completed scan and delegates idempotent PDF generation to its hook. */
 export function ReportForm({ onClose }: { onClose: () => void }) {
   const scans = useScans()
   const targets = useTargets()
   const [error, setError] = useState('')
+  const [scanId, setScanId] = useState('')
   const lastSubmit = useRef(0)
   const lock = useRef(false)
   const navigate = useNavigate()
@@ -25,8 +27,7 @@ export function ReportForm({ onClose }: { onClose: () => void }) {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (lock.current || mutation.isPending || Date.now() - lastSubmit.current < 500) return
-    const form = new FormData(event.currentTarget)
-    const result = CreateReportSchema.safeParse({ scanId: form.get('scanId') })
+    const result = CreateReportSchema.safeParse({ scanId })
     if (!result.success) {
       setError(CONTENT.reports.selectError)
       return
@@ -74,15 +75,17 @@ export function ReportForm({ onClose }: { onClose: () => void }) {
     <form onSubmit={handleSubmit}>
       <div className="field">
         <label htmlFor="report-scan">{CONTENT.reports.form.scan}</label>
-        <select id="report-scan" name="scanId">
-          {completed.map((scan) => (
-            <option key={scan.id} value={scan.id}>
-              {targets.data?.find((target) => target.id === scan.targetId)?.name ??
-                'Archived target'}{' '}
-              / {scan.id}
-            </option>
-          ))}
-        </select>
+        <Select
+          id="report-scan"
+          label={CONTENT.reports.form.scan}
+          placeholder={CONTENT.reports.form.scan}
+          options={completed.map((scan) => ({
+            value: scan.id,
+            label: `${targets.data?.find((target) => target.id === scan.targetId)?.name ?? 'Archived target'} / ${scan.id}`,
+          }))}
+          value={scanId}
+          onChange={setScanId}
+        />
       </div>
       <div className="form-notice">
         <FileCheck2 size={15} aria-hidden="true" />

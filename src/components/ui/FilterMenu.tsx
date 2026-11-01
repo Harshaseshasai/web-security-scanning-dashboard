@@ -1,7 +1,7 @@
 import * as Popover from '@radix-ui/react-popover'
 import { Check, ChevronDown } from 'lucide-react'
-import { capitalize } from '../../lib/utils'
-import { CONTENT } from '../../config/content'
+import { capitalize } from '@/lib/utils'
+import { CONTENT } from '@/config/content'
 
 /** Provides multi-select filters with OR behavior inside one dimension. */
 export function FilterMenu({

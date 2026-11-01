@@ -1,5 +1,5 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react'
-import { cn } from '../../lib/utils'
+import { cn } from '@/lib/utils'
 
 /** Shares pending, disabled, and visual states across form actions. */
 export const Button = forwardRef<

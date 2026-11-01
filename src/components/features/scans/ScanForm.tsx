@@ -2,13 +2,14 @@ import { useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ShieldCheck } from 'lucide-react'
 import { toast } from 'sonner'
-import { useScans, useTargets } from '../../../hooks/use-data'
-import { useCreateScan } from '../../../hooks/use-scan-mutations'
-import { CreateScanSchema } from '../../../schemas/scan.schema'
-import { Button } from '../../ui/Button'
-import { EmptyState, ErrorState, TableSkeleton } from '../../ui/DataState'
-import { useUiStore } from '../../../store/ui.store'
-import { CONTENT } from '../../../config/content'
+import { useScans, useTargets } from '@/hooks/use-data'
+import { useCreateScan } from '@/hooks/use-scan-mutations'
+import { CreateScanSchema } from '@/schemas/scan.schema'
+import { Button } from '@/components/ui/Button'
+import { EmptyState, ErrorState, TableSkeleton } from '@/components/ui/DataState'
+import { useUiStore } from '@/store/ui.store'
+import { CONTENT } from '@/config/content'
+import { Select } from '@/components/ui/Select'
 
 /** Requires authorization and delegates validated scan creation to its hook. */
 export function ScanForm({ targetId, onClose }: { targetId: string; onClose: () => void }) {
@@ -16,6 +17,8 @@ export function ScanForm({ targetId, onClose }: { targetId: string; onClose: () 
   const scans = useScans()
   const [error, setError] = useState('')
   const [authorized, setAuthorized] = useState(false)
+  const [selectedTargetId, setSelectedTargetId] = useState(targetId)
+  const [profile, setProfile] = useState('full')
   const lock = useRef(false)
   const navigate = useNavigate()
   const openModal = useUiStore((state) => state.openModal)
@@ -25,10 +28,9 @@ export function ScanForm({ targetId, onClose }: { targetId: string; onClose: () 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (lock.current || mutation.isPending) return
-    const form = new FormData(event.currentTarget)
     const result = CreateScanSchema.safeParse({
-      targetId: form.get('targetId'),
-      profile: form.get('profile'),
+      targetId: selectedTargetId,
+      profile,
     })
     if (!result.success) {
       setError(CONTENT.scans.targetError)
@@ -71,30 +73,38 @@ export function ScanForm({ targetId, onClose }: { targetId: string; onClose: () 
     <form onSubmit={handleSubmit}>
       <div className="field">
         <label htmlFor="scan-target">{CONTENT.scans.form.target}</label>
-        <select id="scan-target" name="targetId" defaultValue={targetId}>
-          <option value="" disabled>
-            {CONTENT.scans.form.chooseTarget}
-          </option>
-          {targets.data.map((target) => {
+        <Select
+          id="scan-target"
+          label={CONTENT.scans.form.target}
+          placeholder={CONTENT.scans.form.chooseTarget}
+          options={targets.data.map((target) => {
             const busy = scans.data?.some(
               (scan) => scan.targetId === target.id && ['running', 'queued'].includes(scan.status)
             )
-            return (
-              <option key={target.id} value={target.id} disabled={busy}>
-                {target.name}
-                {busy === true ? ` ${CONTENT.scans.form.scanInProgress}` : ''}
-              </option>
-            )
+            return {
+              value: target.id,
+              label: busy ? `${target.name} ${CONTENT.scans.form.scanInProgress}` : target.name,
+              disabled: busy,
+            }
           })}
-        </select>
+          value={selectedTargetId}
+          onChange={setSelectedTargetId}
+        />
       </div>
       <div className="field">
         <label htmlFor="scan-profile">{CONTENT.scans.form.profile}</label>
-        <select id="scan-profile" name="profile">
-          <option value="full">{CONTENT.scans.form.full}</option>
-          <option value="quick">{CONTENT.scans.form.quick}</option>
-          <option value="api">{CONTENT.scans.form.api}</option>
-        </select>
+        <Select
+          id="scan-profile"
+          label={CONTENT.scans.form.profile}
+          placeholder={CONTENT.scans.form.profile}
+          options={[
+            { value: 'full', label: CONTENT.scans.form.full },
+            { value: 'quick', label: CONTENT.scans.form.quick },
+            { value: 'api', label: CONTENT.scans.form.api },
+          ]}
+          value={profile}
+          onChange={setProfile}
+        />
         <small>{CONTENT.scans.form.profileHelp}</small>
       </div>
       <div className="form-notice">

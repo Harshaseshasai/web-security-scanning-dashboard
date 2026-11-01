@@ -1,10 +1,10 @@
 import { Bell, ChevronRight, Menu, PanelLeftClose, PanelLeftOpen, Search } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useUiStore } from '../../store/ui.store'
+import { useUiStore } from '@/store/ui.store'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { IconHint } from '../ui/Tooltip'
-import { useFindings, useScans } from '../../hooks/use-data'
-import { CONTENT } from '../../config/content'
+import { IconHint } from '@/components/ui/Tooltip'
+import { useFindings, useScans } from '@/hooks/use-data'
+import { CONTENT } from '@/config/content'
 
 /** Connects breadcrumbs, finding search, and contextual icon actions to the workspace. */
 export function AppHeader() {

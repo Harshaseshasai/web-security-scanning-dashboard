@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom'
 import { useCallback, useMemo } from 'react'
-import { readFilters } from '../lib/findings-filter'
+import { readFilters } from '@/lib/findings-filter'
 
 /** Derives shareable filter, sort, and page controls from URL parameters. */
 export function useFindingsFilter() {

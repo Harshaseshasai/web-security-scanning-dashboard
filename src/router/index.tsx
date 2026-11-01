@@ -1,13 +1,13 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { ProtectedRoute } from './ProtectedRoute'
-import { AppShell } from '../components/layout/AppShell'
-import LoginPage from '../pages/LoginPage'
-import DashboardPage from '../pages/DashboardPage'
-import TargetsPage from '../pages/TargetsPage'
-import ScansPage from '../pages/ScansPage'
-import FindingsPage from '../pages/FindingsPage'
-import FindingDetailPage from '../pages/FindingDetailPage'
-import ReportsPage from '../pages/ReportsPage'
+import { AppShell } from '@/components/layout/AppShell'
+import LoginPage from '@/pages/LoginPage'
+import DashboardPage from '@/pages/DashboardPage'
+import TargetsPage from '@/pages/TargetsPage'
+import ScansPage from '@/pages/ScansPage'
+import FindingsPage from '@/pages/FindingsPage'
+import FindingDetailPage from '@/pages/FindingDetailPage'
+import ReportsPage from '@/pages/ReportsPage'
 
 /** Declares every protected workspace route and the public login entry. */
 export function AppRoutes() {

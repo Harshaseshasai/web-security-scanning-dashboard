@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { ScanStatusBadge } from '../../ui/Badges'
-import { EmptyState } from '../../ui/DataState'
-import { formatDuration, hostname, relativeTime } from '../../../lib/utils'
-import type { Scan, Target } from '../../../types'
-import { useUiStore } from '../../../store/ui.store'
-import { CONTENT } from '../../../config/content'
+import { ScanStatusBadge } from '@/components/ui/Badges'
+import { EmptyState } from '@/components/ui/DataState'
+import { formatDuration, hostname, relativeTime } from '@/lib/utils'
+import type { Scan, Target } from '@/types'
+import { useUiStore } from '@/store/ui.store'
+import { CONTENT } from '@/config/content'
 
 /** Displays keyboard-operable scan rows with progress and nonzero severity counts. */
 export function ScansTable({

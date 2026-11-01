@@ -1,4 +1,4 @@
-import { CONTENT } from '../../config/content'
+import { CONTENT } from '@/config/content'
 
 /** Draws the configured product mark without loading an external image. */
 export function BrandMark() {

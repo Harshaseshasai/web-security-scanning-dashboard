@@ -1,15 +1,17 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { ShieldCheck } from 'lucide-react'
 import { toast } from 'sonner'
-import { CreateTargetSchema } from '../../../schemas/target.schema'
-import { useCreateTarget, useUpdateTarget } from '../../../hooks/use-target-mutations'
-import { Button } from '../../ui/Button'
-import type { Target } from '../../../types'
-import { CONTENT } from '../../../config/content'
+import { CreateTargetSchema } from '@/schemas/target.schema'
+import { useCreateTarget, useUpdateTarget } from '@/hooks/use-target-mutations'
+import { Button } from '@/components/ui/Button'
+import type { Target } from '@/types'
+import { CONTENT } from '@/config/content'
+import { Select } from '@/components/ui/Select'
 
 /** Validates target ownership fields, then delegates cache-safe persistence to hooks. */
 export function TargetForm({ target, onClose }: { target?: Target; onClose: () => void }) {
   const [authenticated, setAuthenticated] = useState(target?.authenticated ?? false)
+  const [environment, setEnvironment] = useState<string>(target?.environment ?? 'production')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const submitted = useRef(false)
   const createTarget = useCreateTarget()
@@ -24,7 +26,7 @@ export function TargetForm({ target, onClose }: { target?: Target; onClose: () =
     const parsed = CreateTargetSchema.safeParse({
       name: values.get('name'),
       url: values.get('url'),
-      environment: values.get('environment'),
+      environment,
       authenticated,
       ...(authenticated
         ? { username: values.get('username'), password: values.get('password') }
@@ -80,17 +82,17 @@ export function TargetForm({ target, onClose }: { target?: Target; onClose: () =
       </div>
       <div className="field">
         <label htmlFor="target-environment">{CONTENT.targets.form.environment}</label>
-        <select
+        <Select
           id="target-environment"
-          name="environment"
-          defaultValue={target?.environment ?? 'production'}
-        >
-          {Object.entries(CONTENT.environments).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+          label={CONTENT.targets.form.environment}
+          placeholder={CONTENT.targets.form.environment}
+          options={Object.entries(CONTENT.environments).map(([value, label]) => ({
+            value,
+            label,
+          }))}
+          value={environment}
+          onChange={setEnvironment}
+        />
       </div>
       <label className="check-label" htmlFor="target-authenticated">
         <input

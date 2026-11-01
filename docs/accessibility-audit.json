@@ -1,0 +1,10 @@
+[
+  { "route": "/dashboard", "violations": [] },
+  { "route": "/findings", "violations": [] },
+  { "route": "/targets", "violations": [] },
+  { "route": "/scans", "violations": [] },
+  { "route": "/findings/fnd_5231", "violations": [] },
+  { "route": "/reports", "violations": [] },
+  { "route": "/settings-modal", "violations": [] },
+  { "route": "/login", "violations": [] }
+]

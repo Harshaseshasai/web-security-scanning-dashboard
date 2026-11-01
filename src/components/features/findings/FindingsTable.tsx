@@ -1,11 +1,11 @@
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FindingStatusBadge, SeverityBadge } from '../../ui/Badges'
-import { Button } from '../../ui/Button'
-import { EmptyState, ErrorState, TableSkeleton } from '../../ui/DataState'
-import { dateLabel, hostname } from '../../../lib/utils'
-import type { Finding, Filters, Target } from '../../../types'
-import { CONTENT } from '../../../config/content'
+import { FindingStatusBadge, SeverityBadge } from '@/components/ui/Badges'
+import { Button } from '@/components/ui/Button'
+import { EmptyState, ErrorState, TableSkeleton } from '@/components/ui/DataState'
+import { dateLabel, hostname } from '@/lib/utils'
+import type { Finding, Filters, Target } from '@/types'
+import { CONTENT } from '@/config/content'
 
 const columns = [
   { key: 'title', label: CONTENT.findings.columns.finding },

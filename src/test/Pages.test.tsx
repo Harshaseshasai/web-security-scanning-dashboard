@@ -3,22 +3,26 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { toast } from 'sonner'
-import FindingsPage from '../pages/FindingsPage'
-import FindingDetailPage from '../pages/FindingDetailPage'
-import TargetsPage from '../pages/TargetsPage'
-import ScansPage from '../pages/ScansPage'
-import ReportsPage from '../pages/ReportsPage'
-import DashboardPage from '../pages/DashboardPage'
-import { GlobalModals } from '../components/layout/GlobalModals'
-import { AppRoutes } from '../router'
+import FindingsPage from '@/pages/FindingsPage'
+import FindingDetailPage from '@/pages/FindingDetailPage'
+import TargetsPage from '@/pages/TargetsPage'
+import ScansPage from '@/pages/ScansPage'
+import ReportsPage from '@/pages/ReportsPage'
+import DashboardPage from '@/pages/DashboardPage'
+import { GlobalModals } from '@/components/layout/GlobalModals'
+import { AppRoutes } from '@/router'
 import { renderView, resetStores, seededClient } from './render'
-import { useUiStore } from '../store/ui.store'
-import { useFindingStore } from '../store/findings-filter.store'
-import { useThemeStore } from '../store/theme.store'
+import { useUiStore } from '@/store/ui.store'
+import { useFindingStore } from '@/store/findings-filter.store'
+import { useThemeStore } from '@/store/theme.store'
 import { server } from './setup'
-import { findings } from '../mocks/data/findings'
+import { findings } from '@/mocks/data/findings'
 
 beforeEach(resetStores)
+async function chooseOption(label: string, option: string) {
+  await userEvent.click(screen.getByRole('combobox', { name: label }))
+  await userEvent.click(screen.getByRole('option', { name: option }))
+}
 describe('Findings workflow', () => {
   it('debounces search, writes URL state, and resets the page', async () => {
     renderView(<FindingsPage />, { route: '/findings?page=2', client: seededClient() })
@@ -45,7 +49,7 @@ describe('Findings workflow', () => {
     await userEvent.click(screen.getAllByRole('button', { name: 'Category' })[0])
     await userEvent.click(screen.getByLabelText('A03: Injection'))
     await userEvent.keyboard('{Escape}')
-    await userEvent.selectOptions(screen.getByLabelText('Filter by target'), 'tgt_03')
+    await chooseOption('Filter by target', 'Public website')
     expect(screen.getAllByRole('row', { name: /^Open finding/ })).toHaveLength(1)
     await userEvent.click(screen.getByRole('button', { name: 'Clear' }))
     expect(screen.getAllByRole('row', { name: /^Open finding/ })).toHaveLength(20)
@@ -116,14 +120,14 @@ describe('Finding details', () => {
     expect(
       screen.getByRole('heading', { name: 'SQL injection in search endpoint' })
     ).toBeInTheDocument()
-    expect(screen.getByLabelText('Change finding status')).toHaveValue('')
+    expect(screen.getByLabelText('Change finding status')).toHaveTextContent('Choose next status')
     expect(screen.getByText('Current status').parentElement).toHaveTextContent('Open')
-    await user.selectOptions(screen.getByLabelText('Change finding status'), 'confirmed')
+    await chooseOption('Change finding status', 'Confirmed')
     expect(useFindingStore.getState().overrides['fnd_5231']).toBe('confirmed')
-    await user.selectOptions(screen.getByLabelText('Change finding status'), 'resolved')
-    await user.selectOptions(screen.getByLabelText('Change finding status'), 'open')
-    await user.selectOptions(screen.getByLabelText('Change finding status'), 'false_positive')
-    await user.selectOptions(screen.getByLabelText('Change finding status'), 'open')
+    await chooseOption('Change finding status', 'Resolved')
+    await chooseOption('Change finding status', 'Open')
+    await chooseOption('Change finding status', 'False positive')
+    await chooseOption('Change finding status', 'Open')
     await user.click(screen.getByRole('button', { name: 'Copy request' }))
     expect(await navigator.clipboard.readText()).toContain('GET /api/v1/search')
   })
@@ -148,7 +152,7 @@ describe('Targets, scans, and reports', () => {
       </>,
       { client: seededClient() }
     )
-    await userEvent.selectOptions(screen.getByLabelText('Filter environment'), 'dev')
+    await chooseOption('Filter environment', 'Development')
     expect(screen.getByText('Internal API')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('Search targets'), { target: { value: 'missing' } })
     await userEvent.click(await screen.findByRole('button', { name: 'Clear filters' }))
@@ -243,7 +247,7 @@ describe('Dashboard and shell', () => {
   it('renders honest totals, date controls, and activity', async () => {
     renderView(<DashboardPage />, { client: seededClient() })
     expect(screen.getByRole('heading', { name: 'Security overview' })).toBeInTheDocument()
-    await userEvent.selectOptions(screen.getByLabelText('Chart time range'), '7')
+    await chooseOption('Chart time range', 'Last 7 days')
     expect(screen.getByRole('img')).toHaveAttribute('aria-label', expect.stringContaining('7 days'))
     await userEvent.click(screen.getByRole('button', { name: /Date range/ }))
     await userEvent.click(screen.getByRole('button', { name: 'Last 30 days' }))

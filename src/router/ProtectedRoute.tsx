@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { useAuthStore } from '../store/auth.store'
+import { useAuthStore } from '@/store/auth.store'
 
 /** Redirects signed-out visits while preserving their requested URL for login. */
 export function ProtectedRoute() {

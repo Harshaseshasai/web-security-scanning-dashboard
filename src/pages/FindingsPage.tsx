@@ -1,28 +1,29 @@
 import { useEffect, useState } from 'react'
 import { CheckCheck, Download, Search, X } from 'lucide-react'
 import { toast } from 'sonner'
-import { PageHeader } from '../components/layout/PageHeader'
-import { Button } from '../components/ui/Button'
-import { FilterMenu } from '../components/ui/FilterMenu'
-import { EmptyState } from '../components/ui/DataState'
-import { FindingsTable } from '../components/features/findings/FindingsTable'
-import { useFindings, useFindingsQuery, useTargets } from '../hooks/use-data'
-import { useFindingsFilter } from '../hooks/use-findings-filter'
-import { filterFindings } from '../lib/findings-filter'
-import { SeveritySchema } from '../schemas/finding.schema'
-import { FINDING_STATUS_CONFIG } from '../config/status.config'
-import { FindingStatusMark } from '../components/ui/Badges'
-import { CONTENT } from '../config/content'
-import { useUiStore } from '../store/ui.store'
-import { useFindingStore } from '../store/findings-filter.store'
-import { downloadFile, findingsCsv } from '../lib/download'
-import { IconHint } from '../components/ui/Tooltip'
+import { PageHeader } from '@/components/layout/PageHeader'
+import { Button } from '@/components/ui/Button'
+import { FilterMenu } from '@/components/ui/FilterMenu'
+import { EmptyState } from '@/components/ui/DataState'
+import { FindingsTable } from '@/components/features/findings/FindingsTable'
+import { useFindingsQuery, useTargets } from '@/hooks/use-data'
+import { useFindingsFilter } from '@/hooks/use-findings-filter'
+import { filterFindings } from '@/lib/findings-filter'
+import { SeveritySchema } from '@/schemas/finding.schema'
+import { FINDING_STATUS_CONFIG } from '@/config/status.config'
+import { FindingStatusMark } from '@/components/ui/Badges'
+import { CONTENT } from '@/config/content'
+import { useUiStore } from '@/store/ui.store'
+import { useFindingStore } from '@/store/findings-filter.store'
+import { downloadFile, findingsCsv } from '@/lib/download'
+import { IconHint } from '@/components/ui/Tooltip'
+import { Select } from '@/components/ui/Select'
 
 /** Coordinates URL filters, finding data, bulk selection, and exports. */
 export default function FindingsPage() {
   const { filters, setFilter, resetFilters, setSortState, setPage } = useFindingsFilter()
   const query = useFindingsQuery(filters)
-  const registry = useFindings()
+  const registry = query.all
   const targets = useTargets()
   const [search, setSearch] = useState(filters.search)
   const selected = useUiStore((state) => state.selectedRows)
@@ -41,7 +42,7 @@ export default function FindingsPage() {
       clearTimeout(timer)
     }
   }, [search, filters.search, setFilter])
-  const filteredAll = filterFindings(registry.data ?? [], { ...filters, page: 1, pageSize: 100 })
+  const filteredAll = filterFindings(registry ?? [], { ...filters, page: 1, pageSize: 100 })
   const total = query.data?.total ?? 0
   const rows = query.data?.items ?? []
   const hasFilters =
@@ -54,7 +55,7 @@ export default function FindingsPage() {
   /** Downloads either the selected findings or the full filtered result as CSV. */
   const exportRows = () => {
     const exportData = selected.length
-      ? (registry.data ?? []).filter((finding) => selected.includes(finding.id))
+      ? (registry ?? []).filter((finding) => selected.includes(finding.id))
       : filteredAll.all
     downloadFile('sentinel-findings.csv', findingsCsv(exportData), 'text/csv;charset=utf-8')
     toast.success(`Exported ${exportData.length} findings`)
@@ -63,7 +64,7 @@ export default function FindingsPage() {
   /** Confirms only selected open findings, leaving other workflow statuses untouched. */
   const confirmSelection = () => {
     let count = 0
-    registry.data
+    registry
       ?.filter((finding) => selected.includes(finding.id))
       .forEach((finding) => {
         if (setStatus(finding.id, finding.status, 'confirmed')) count++
@@ -72,7 +73,7 @@ export default function FindingsPage() {
     toast.success(`${count} open findings confirmed`)
   }
   const confirmableCount =
-    registry.data?.filter((finding) => selected.includes(finding.id) && finding.status === 'open')
+    registry?.filter((finding) => selected.includes(finding.id) && finding.status === 'open')
       .length ?? 0
   return (
     <>
@@ -87,7 +88,7 @@ export default function FindingsPage() {
         }
       />
       <div className="tabs-row">
-        <div className="tabs">
+        <div className="tabs tabs-findings">
           <button
             className={`tab ${!filters.status.length ? 'active' : ''}`}
             onClick={() => {
@@ -95,7 +96,7 @@ export default function FindingsPage() {
             }}
           >
             {CONTENT.findings.all}
-            <span className="tab-counter">{registry.data?.length ?? 0}</span>
+            <span className="tab-counter">{registry?.length ?? 0}</span>
           </button>
           {Object.entries(FINDING_STATUS_CONFIG).map(([value, config]) => (
             <button
@@ -108,7 +109,7 @@ export default function FindingsPage() {
               <FindingStatusMark status={value as keyof typeof FINDING_STATUS_CONFIG} />
               {config.label}
               <span className="tab-counter">
-                {registry.data?.filter((finding) => finding.status === value).length ?? 0}
+                {registry?.filter((finding) => finding.status === value).length ?? 0}
               </span>
             </button>
           ))}
@@ -152,7 +153,7 @@ export default function FindingsPage() {
         />
         <FilterMenu
           label="Category"
-          options={[...new Set(registry.data?.map((finding) => finding.category))]
+          options={[...new Set(registry?.map((finding) => finding.category))]
             .sort()
             .map((value) => ({ value, label: value }))}
           selected={filters.category}
@@ -171,24 +172,19 @@ export default function FindingsPage() {
             setFilter('status', values)
           }}
         />
-        <label htmlFor="findings-target" className="sr-only">
-          {CONTENT.findings.filterTargetLabel}
-        </label>
-        <select
+        <Select
           id="findings-target"
-          className="filter-button"
+          label={CONTENT.findings.filterTargetLabel}
+          placeholder={CONTENT.findings.allTargets}
+          options={[
+            { value: '', label: CONTENT.findings.allTargets },
+            ...(targets.data?.map((target) => ({ value: target.id, label: target.name })) ?? []),
+          ]}
           value={filters.target}
-          onChange={(event) => {
-            setFilter('target', event.target.value)
+          onChange={(value) => {
+            setFilter('target', value)
           }}
-        >
-          <option value="">{CONTENT.findings.allTargets}</option>
-          {targets.data?.map((target) => (
-            <option key={target.id} value={target.id}>
-              {target.name}
-            </option>
-          ))}
-        </select>
+        />
         {Boolean(hasFilters) && (
           <Button
             variant="ghost"
@@ -249,7 +245,7 @@ export default function FindingsPage() {
             </IconHint>
           </div>
         )}
-        {!registry.isLoading && !registry.isError && registry.data?.length === 0 ? (
+        {!query.isLoading && !query.isError && registry?.length === 0 ? (
           <EmptyState
             title={CONTENT.findings.emptyTitle}
             description={CONTENT.findings.emptyDescription}

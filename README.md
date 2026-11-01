@@ -1,82 +1,98 @@
-# Sentinel Security Workspace
+# Web Security Scanning Dashboard
 
-Sentinel is a React 18 and TypeScript security assessment console for analysts. Add authorized targets, follow simulated scans, investigate evidence, triage findings, and download reports. The interface pairs a quiet operational dashboard with dense, URL-driven findings tables and dark terminal evidence. This is a self-contained assessment demo: it does not scan real websites or transmit target credentials to a real service.
+A React 18 and TypeScript console for a security analyst to register authorized targets, launch simulated scans, triage findings, and generate report records. This is a frontend assignment demo: it does not scan live websites or send target credentials to an external service.
 
-![The running Sentinel dashboard](docs/screenshots/dashboard.png)
+**Live demo:** [web-security-scanning-dashboard.vercel.app](https://web-security-scanning-dashboard.vercel.app)  
+**Repository:** [Harshaseshasai/web-security-scanning-dashboard](https://github.com/Harshaseshasai/web-security-scanning-dashboard)
 
-## Stack And Ownership
+## Assignment Fit
 
-React 18, TypeScript, Vite, Tailwind, React Router v6, locally owned Radix primitives, Zustand, TanStack Query, Zod, MSW, Recharts, and Vitest. DM Sans is the UI face; IBM Plex Mono is reserved for technical identifiers and evidence. The provided Vite 7 and Tailwind 4 host configuration is retained instead of downgrading it; see DEC-010.
+| Assignment requirement      | Current implementation                                                                                                                                                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Login and protected screens | Demo login; protected dashboard, targets, scans, findings, finding detail, and reports routes.                                                                                                                      |
+| Dashboard                   | Target/scan/finding KPIs, severity breakdown, findings-over-time chart, and recent scans.                                                                                                                           |
+| Targets                     | Validated add/edit/remove flows; authenticated-scan credentials are validated and discarded by the mock.                                                                                                            |
+| Scans                       | Queued/running/completed/failed states, timed progress, authorization confirmation, and completed-scan findings links.                                                                                              |
+| Findings                    | URL-backed search, combined filters, sorting, pagination, row selection, CSV export, and triage. Filtering is client-side against the contract list.                                                                |
+| Finding detail              | Description, location, request/response evidence, remediation, and session-only status transitions.                                                                                                                 |
+| Reports and settings        | Report list, scan selection, generation retry, PDF placeholder, profile/theme/API-key settings. Settings is a modal, not a separate URL; this is a caveat if each screen is interpreted as requiring its own route. |
+| Mock data and states        | 6 targets, 12 scans, and 48 findings; loading, empty, and error states; 300-800 ms simulated latency and a deliberate report-generation 503.                                                                        |
 
-**Zustand** handles all client state with no server analogue:
+The core functional scope is implemented. Two strict-interpretation gaps remain: Tailwind 4 is configured, but most visual styling is authored in `src/index.css` rather than expressed utility-first; and Settings has no dedicated route. `vercel.json` provides the SPA rewrite for the deployed demo.
 
-- Auth token and session
-- Active theme (light/dark) with localStorage persistence
-- Finding status mutations (open to confirmed to resolved / false_positive), local-session-only per brief
-- UI state: sidebar collapsed, active modal, selected rows
+## Screens
 
-**Why not Context?** Auth and theme must be read in deeply nested components. Context causes every Consumer to re-render on any change. Zustand with `subscribeWithSelector` enables surgical re-renders: only the component that reads the specific slice re-renders.
+The assignment groups Reports and Settings as screen 07; both views are shown below.
 
-**Why not Redux Toolkit?** Correct architecture, 3x the boilerplate for a session-scoped mock.
+| 01 - Login                                                    | 02 - Dashboard                                                            |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| ![Sentinel login screen](docs/screenshots/login.png)          | ![Security overview dashboard](docs/screenshots/dashboard.png)            |
+| 03 - Targets                                                  | 04 - Scans                                                                |
+| ![Target inventory screen](docs/screenshots/targets.png)      | ![Scan history screen](docs/screenshots/scans.png)                        |
+| 05 - Findings                                                 | 06 - Finding detail                                                       |
+| ![Findings table with filters](docs/screenshots/findings.png) | ![Finding detail with HTTP evidence](docs/screenshots/finding-detail.png) |
+| 07 - Reports                                                  | 07 - Settings                                                             |
+| ![Generated reports screen](docs/screenshots/reports.png)     | ![Profile and appearance settings dialog](docs/screenshots/settings.png)  |
 
-**TanStack Query** handles all server state (mock API responses):
+[Mobile dashboard screenshot](docs/screenshots/mobile.png) - [Mobile findings screenshot](docs/screenshots/mobile-findings.png) - [Dark reports screenshot](docs/screenshots/dark-reports.png)
 
-- Targets, Scans, Findings, Reports lists
-- Individual finding by ID
-- Mutations: add/edit/delete target, create scan, generate report
+## Navigation And Keyboard
 
-**Why TanStack Query?** Built-in `isLoading`, `isError`, `data` states eliminate boilerplate and directly satisfy the brief's requirement for loading and error states on every data view. `useMutation` with `onMutate` enables optimistic updates: add/edit/delete feels instant while the mock API resolves. Without it, you write `useState` + `useEffect` + `try/catch` for every single endpoint: that's five extra files for six endpoints.
+The sidebar links navigate to `/dashboard`, `/targets`, `/scans`, `/findings`, and `/reports`. Finding rows open `/findings/:id`; direct visits to protected routes redirect to `/login`. Workspace, help, notification, and settings panels open dialogs.
 
-**Why both?** They solve different problems. TanStack Query caches server responses. Zustand manages what only the client knows. Merging them into one creates coupling between concerns that should be independent.
+- `Tab` and `Shift+Tab` move through links and controls; the skip link moves focus to the main content.
+- `Enter` activates links and buttons. `Space` activates buttons and toggles native checkboxes.
+- The custom select opens with `Enter`, `Space`, or an arrow key. `ArrowUp`/`ArrowDown` moves through enabled options, `Home`/`End` goes to the first/last option, `Enter`/`Space` selects, and `Escape` closes.
+- Scan rows support `Enter` and `Space`. Filter popovers use native checkboxes.
+- Dialogs trap focus while open, close with `Escape`, and restore focus to their trigger.
+- Findings search/filter/sort/page state is represented in the URL so browser back/forward navigation restores the view.
 
-## Setup And Run
+`npm run test:browser` checks these workflows, captures the screenshots above, and writes the axe report to `docs/accessibility-audit.json`.
+
+## Stack And State
+
+React 18, TypeScript, Vite, Tailwind CSS 4, React Router, Radix primitives, TanStack Query, Zustand, Zod, MSW, Recharts, and Vitest. DM Sans is used for interface text; IBM Plex Mono is used for identifiers and HTTP evidence.
+
+TanStack Query owns API-backed data and optimistic target mutations. Zustand owns session/theme/UI state and session-only finding status overrides. Findings filters, sorting, and page number are reflected in URL search parameters; the 48-row contract list is fetched from `GET /api/findings` and filtered client-side.
+
+See [Architecture](docs/ARCHITECTURE.md), [API](docs/API.md), and [Design](docs/DESIGN.md) for implementation details.
+
+## Setup And Verification
+
+Node 20.19+ is required.
 
 ```sh
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
-Node 20.19+ is required by the preconfigured Vite host. npm is equally supported (`npm install`, `npm run dev`), and an npm lockfile is included. No API keys are needed. The MSW worker is checked into `public/`; regenerate it with `npx msw init public` if necessary.
+Use the demo account `demo@example.com` / `password123`, or select **Enter demo workspace**. The MSW worker is checked into `public/`. In development, requests use MSW; static preview builds use the same in-memory mock service unless `VITE_LIVE_API=true` is set for a real `/api` backend.
 
 ```sh
-pnpm build
-pnpm preview
+npm run check:conventions
+npm run lint
+npm run format:check
+npm run typecheck
+npm test
+npm run coverage
+npm run build
 ```
 
-## Tests And Quality
+Coverage thresholds are configured at 90% for statements, branches, functions, and lines. The GitHub Actions quality workflow runs conventions, lint, formatting, typecheck, coverage, and build. The pre-commit hook runs the five local checks.
+
+Run the browser workflow while Vite is running:
 
 ```sh
-pnpm test
-pnpm coverage
-pnpm check:conventions
-pnpm lint
-pnpm format:check
-pnpm typecheck
+npm run test:browser
 ```
 
-Vitest tests exercise schema boundaries, combined filter logic, sorting, pagination, keyboard navigation, auth guards, data states, optimistic rollback, idempotency, triage transitions, and report retry. The coverage command retains the requested 90% threshold for statements, branches, functions, and lines; it deliberately fails if any metric is below that threshold. See `docs/VERIFICATION.md` for measured results, not an implied coverage claim.
+It defaults to `http://localhost:5173`; set `SMOKE_URL` to use another local origin.
 
-The pre-commit hook runs all five local gates. Enable it in a Git checkout with `git config core.hooksPath .husky`. GitHub Actions additionally runs coverage and the production build. No synthetic commit history has been created.
+## Known Limits
 
-## Demo Credentials
-
-```text
-Email: demo@example.com
-Password: password123
-Token: mock-jwt-token-demo
-```
-
-The app opens at login. Use the demo account or the "Enter demo workspace" button to authenticate; direct visits to protected routes redirect to `/login`. An authenticated visit to `/login` redirects to the dashboard. Authentication remains a fake session token, not a real security boundary.
-
-## Known Gaps And Assumptions
-
-- Vite 7 and Tailwind 4 are host requirements. All supplied OKLCH tokens are preserved; severity extensions use Tailwind 4's `@theme` rather than a v3 configuration file.
-- MSW is imported only in development. Static preview builds use the same in-memory service through a documented demo transport, but still require explicit sign-in. Set `VITE_LIVE_API=true` when supplying a real backend.
-- The first report-generation request intentionally returns 503. The persistent inline error and enabled retry control are expected behavior, not a broken feature.
-- The "Download PDF" action is an explicit demo placeholder with an explanatory toast; HTML can be printed to PDF using the browser. Server-side PDF generation is not implemented. Findings can be exported as CSV.
-- Dataset dates are anchored to October 31, 2026, for reproducible demos. Dashboard totals, severity counts, and historical chart series are computed from the same 48 findings, not unrelated marketing metrics.
-- Target credentials are validated, consumed, and discarded. Finding status overrides reset on reload or sign-out. Mock entity changes reset when the page is reloaded.
-- The preserved single-file Vite configuration prevents effective route code-splitting. The current artifact exceeds the requested 200 KB gzip initial budget; LCP under fast 3G is not certified. See `docs/PROD.md`.
-- Client-side guards and mock tokens are not production authentication. Do not deploy this demo as a real scanner or use real credentials.
-
-See [Architecture](docs/ARCHITECTURE.md) ([detailed pages](docs/architecture/README.md)), [Design](docs/DESIGN.md), [Interface audit](docs/UI-AUDIT.md), [Decisions](docs/DECISIONS.md), [Trade-offs](docs/DOUBLE-DOWN.md), and [Production](docs/PROD.md).
+- The PDF action is a deliberate placeholder toast; no PDF bytes are generated or downloaded. Report metadata is returned by the mock API.
+- The first report-generation request deliberately returns 503; retry succeeds.
+- Mock mutations reset on reload. Target credentials are validated and discarded. Finding-status overrides are session-only.
+- Authentication uses a fake demo token and is not a security boundary. Do not use this app with real targets or credentials.
+- Tailwind is configured, but the project is not strictly utility-first; most layout and component styles are custom CSS.
+- Settings is exposed as a modal rather than its own route.

@@ -1,6 +1,6 @@
 import { AlertTriangle, RotateCcw, SearchX } from 'lucide-react'
 import { Button } from './Button'
-import { CONTENT } from '../../config/content'
+import { CONTENT } from '@/config/content'
 
 /** Keeps API failures visible until the analyst explicitly retries. */
 export function ErrorState({ error, retry }: { error: Error | null; retry: () => void }) {

@@ -1,5 +1,5 @@
 import { forwardRef, type ComponentProps, type ReactNode } from 'react'
-import { useReveal } from '../../hooks/use-reveal'
+import { useReveal } from '@/hooks/use-reveal'
 
 type RevealProps = ComponentProps<'section'> & { children: ReactNode }
 

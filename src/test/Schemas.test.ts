@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest'
-import { FindingSchema, FindingStatusSchema, SeveritySchema } from '../schemas/finding.schema'
-import { CreateTargetSchema, TargetSchema } from '../schemas/target.schema'
-import { ScanSchema } from '../schemas/scan.schema'
-import { LoginSchema } from '../schemas/auth.schema'
-import { ReportSchema } from '../schemas/report.schema'
-import { findings } from '../mocks/data/findings'
-import { targets } from '../mocks/data/targets'
-import { scans } from '../mocks/data/scans'
-import { reports } from '../mocks/data/reports'
+import { FindingSchema, FindingStatusSchema, SeveritySchema } from '@/schemas/finding.schema'
+import { CreateTargetSchema, TargetSchema } from '@/schemas/target.schema'
+import { ScanSchema } from '@/schemas/scan.schema'
+import { LoginSchema } from '@/schemas/auth.schema'
+import { ReportSchema } from '@/schemas/report.schema'
+import { findings } from '@/mocks/data/findings'
+import { targets } from '@/mocks/data/targets'
+import { scans } from '@/mocks/data/scans'
+import { reports } from '@/mocks/data/reports'
 
 describe('Strict schema contracts', () => {
   it('uses OWASP Top 10 categories and weakness-specific HTTP evidence', () => {

@@ -2,15 +2,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
-import { TargetForm } from '../components/features/targets/TargetForm'
-import { ScanForm } from '../components/features/scans/ScanForm'
-import { ReportForm } from '../components/features/reports/ReportForm'
+import { TargetForm } from '@/components/features/targets/TargetForm'
+import { ScanForm } from '@/components/features/scans/ScanForm'
+import { ReportForm } from '@/components/features/reports/ReportForm'
 import { renderView, resetStores, seededClient } from './render'
 import { server } from './setup'
-import { targets } from '../mocks/data/targets'
-import { scans } from '../mocks/data/scans'
-import { reports } from '../mocks/data/reports'
-import { useUiStore } from '../store/ui.store'
+import { targets } from '@/mocks/data/targets'
+import { scans } from '@/mocks/data/scans'
+import { reports } from '@/mocks/data/reports'
+import { useUiStore } from '@/store/ui.store'
 
 beforeEach(resetStores)
 /** Fills the shared valid target fields used by form submission tests. */
@@ -19,6 +19,10 @@ function fillTarget() {
   fireEvent.change(screen.getByLabelText('Target URL'), {
     target: { value: 'https://new.example.com' },
   })
+}
+async function chooseOption(label: string, option: string) {
+  await userEvent.click(screen.getByRole('combobox', { name: label }))
+  await userEvent.click(screen.getByRole('option', { name: option }))
 }
 describe('Target creation and editing', () => {
   it('publishes a server-assigned target ID before the dialog closes', async () => {
@@ -135,7 +139,7 @@ describe('New scan safeguards', () => {
     renderView(<ScanForm targetId="" onClose={vi.fn()} />, { client: seededClient() })
     fireEvent.submit(screen.getByRole('button', { name: 'Start scan' }).closest('form')!)
     expect(screen.getByRole('alert')).toHaveTextContent('Choose a target')
-    await userEvent.selectOptions(screen.getByLabelText('Target'), 'tgt_03')
+    await chooseOption('Target', 'Public website')
     await userEvent.click(screen.getByRole('button', { name: 'Start scan' }))
     expect(screen.getByRole('alert')).toHaveTextContent('Confirm you are authorized')
   })
@@ -205,6 +209,7 @@ describe('Report retry and idempotency', () => {
     )
     const close = vi.fn()
     renderView(<ReportForm onClose={close} />, { client: seededClient() })
+    await chooseOption('Completed scan', 'Public website / scan_120')
     await userEvent.click(screen.getByRole('button', { name: 'Generate report' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('temporarily unavailable')
     const retry = screen.getByRole('button', { name: 'Retry generation' })
@@ -229,6 +234,7 @@ describe('Report retry and idempotency', () => {
       })
     )
     renderView(<ReportForm onClose={vi.fn()} />, { client: seededClient() })
+    await chooseOption('Completed scan', 'Public website / scan_120')
     await userEvent.dblClick(screen.getByRole('button', { name: 'Generate report' }))
     expect(await screen.findByRole('button', { name: 'Generating...' })).toBeDisabled()
     expect(request).toHaveBeenCalledOnce()

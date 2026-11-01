@@ -1,10 +1,8 @@
 import { z } from 'zod'
 import { DEMO_DATE } from '../lib/constants'
-import { filterFindings } from '../lib/findings-filter'
 import { CreateTargetSchema } from '../schemas/target.schema'
 import { CreateScanSchema } from '../schemas/scan.schema'
 import { CreateReportSchema } from '../schemas/report.schema'
-import { FilterSchema } from '../schemas/finding.schema'
 import { LoginSchema } from '../schemas/auth.schema'
 import { targets } from './data/targets'
 import { scans } from './data/scans'
@@ -27,27 +25,6 @@ const scanClocks = new Map(
     .map((scan) => [scan.id, { start: Date.now(), progress: scan.progress }])
 )
 const json = (data: unknown, status = 200) => Response.json(data, { status })
-
-/** Builds a comma-separated query value into a validated filter array. */
-function queryList(value: string | null) {
-  return value?.split(',').filter(Boolean) ?? []
-}
-
-/** Reads search, filter, sort, and pagination parameters into the shared filter schema. */
-function queryFilters(params: URLSearchParams) {
-  return FilterSchema.parse({
-    search: params.get('search') ?? '',
-    severity: queryList(params.get('severity')),
-    category: queryList(params.get('category')),
-    status: queryList(params.get('status')),
-    target: params.get('target') ?? '',
-    scan: params.get('scan') ?? '',
-    sort: params.get('sort') ?? '',
-    direction: params.get('direction') ?? 'none',
-    page: Math.max(1, Number.parseInt(params.get('page') ?? '1') || 1),
-    pageSize: Math.min(100, Number.parseInt(params.get('pageSize') ?? '20') || 20),
-  })
-}
 
 /** Advances each active mock scan from its shared service clock. */
 function updateProgress() {
@@ -108,16 +85,6 @@ export async function mockRequest(request: Request): Promise<Response> {
     if (path === '/api/scans' && method === 'GET') {
       updateProgress()
       return json(scans)
-    }
-    if (path === '/api/findings/query' && method === 'GET') {
-      const filters = queryFilters(url.searchParams)
-      const result = filterFindings(findings, filters)
-      return json({
-        items: result.rows,
-        total: result.total,
-        page: filters.page,
-        pageSize: filters.pageSize,
-      })
     }
     if (path === '/api/findings' && method === 'GET') return json(findings)
     if (path.startsWith('/api/findings/') && method === 'GET') {

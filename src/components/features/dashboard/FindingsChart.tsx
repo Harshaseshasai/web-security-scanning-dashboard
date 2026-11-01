@@ -7,10 +7,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { ChevronDown } from 'lucide-react'
-import type { Finding } from '../../../types'
-import { DEMO_DATE } from '../../../lib/constants'
-import { CONTENT } from '../../../config/content'
+import type { Finding } from '@/types'
+import { DEMO_DATE } from '@/lib/constants'
+import { CONTENT } from '@/config/content'
+import { Select } from '@/components/ui/Select'
+import { Reveal } from '@/components/ui/Reveal'
 
 /** Groups findings by UTC day and plots discovered and resolved totals for the selected window. */
 export function FindingsChart({
@@ -36,7 +37,7 @@ export function FindingsChart({
   const resolved = data.reduce((total, item) => total + item.resolved, 0)
   const discovered = data.reduce((total, item) => total + item.discovered, 0)
   return (
-    <section className="panel" aria-label={CONTENT.dashboard.chartTitle}>
+    <Reveal className="panel" aria-label={CONTENT.dashboard.chartTitle}>
       <div className="panel-heading">
         <div>
           <h2>{CONTENT.dashboard.chartTitle}</h2>
@@ -46,21 +47,19 @@ export function FindingsChart({
           <label htmlFor="chart-period" className="sr-only">
             {CONTENT.dashboard.chartRange}
           </label>
-          <select
-            className="subtle-select"
+          <Select
             id="chart-period"
-            value={days}
-            onChange={(event) => {
-              setDays(Number(event.target.value))
+            label={CONTENT.dashboard.chartRange}
+            placeholder={CONTENT.dashboard.datePresets.replace('{days}', String(days))}
+            options={[7, 14, 30].map((range) => ({
+              value: String(range),
+              label: CONTENT.dashboard.datePresets.replace('{days}', String(range)),
+            }))}
+            value={String(days)}
+            onChange={(value) => {
+              setDays(Number(value))
             }}
-          >
-            {[7, 14, 30].map((range) => (
-              <option key={range} value={range}>
-                {CONTENT.dashboard.datePresets.replace('{days}', String(range))}
-              </option>
-            ))}
-          </select>
-          <ChevronDown size={11} aria-hidden="true" />
+          />
         </div>
       </div>
       <div className="chart-legend">
@@ -133,6 +132,6 @@ export function FindingsChart({
           {resolved} {CONTENT.dashboard.chartSummary} {discovered} {CONTENT.dashboard.chartPeriod}
         </span>
       </div>
-    </section>
+    </Reveal>
   )
 }

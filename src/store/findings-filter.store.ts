@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { FindingStatus } from '../types'
-import { TRANSITIONS } from '../lib/constants'
+import type { FindingStatus } from '@/types'
+import { TRANSITIONS } from '@/lib/constants'
 
 // Section 8.5: filters belong to the URL; only session-only triage lives in this store.
 export const useFindingStore = create(

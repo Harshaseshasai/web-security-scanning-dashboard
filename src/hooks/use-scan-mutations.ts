@@ -1,8 +1,8 @@
 import { useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CreateScanSchema, ScanSchema } from '../schemas/scan.schema'
-import { api } from '../lib/api'
-import type { CreateScan, Scan } from '../types'
+import { CreateScanSchema, ScanSchema } from '@/schemas/scan.schema'
+import { api } from '@/lib/api'
+import type { CreateScan, Scan } from '@/types'
 
 /** Creates an authorized scan, then publishes the returned scan before navigation. */
 export function useCreateScan() {

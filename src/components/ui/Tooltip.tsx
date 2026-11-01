@@ -1,6 +1,6 @@
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import type { ComponentProps, ReactElement } from 'react'
-import { cn } from '../../lib/utils'
+import { cn } from '@/lib/utils'
 
 /** Shares a short hover delay across related controls without changing their focus behavior. */
 export function TooltipProvider({

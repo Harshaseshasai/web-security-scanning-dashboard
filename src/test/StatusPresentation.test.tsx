@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { screen } from '@testing-library/react'
-import { SeverityBadge, StatusBadge } from '../components/ui/Badges'
-import { Button } from '../components/ui/Button'
+import { SeverityBadge, StatusBadge } from '@/components/ui/Badges'
+import { Button } from '@/components/ui/Button'
 import { renderView } from './render'
 
 describe('analyst-facing severity and loading states', () => {

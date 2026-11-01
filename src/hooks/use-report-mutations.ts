@@ -1,8 +1,8 @@
 import { useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CreateReportSchema, ReportSchema } from '../schemas/report.schema'
-import { api } from '../lib/api'
-import type { CreateReport, Report } from '../types'
+import { CreateReportSchema, ReportSchema } from '@/schemas/report.schema'
+import { api } from '@/lib/api'
+import type { CreateReport, Report } from '@/types'
 
 /** Generates a PDF report through the retryable report endpoint. */
 export function useGenerateReport() {

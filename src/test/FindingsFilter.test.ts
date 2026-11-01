@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { filterFindings, readFilters } from '../lib/findings-filter'
-import { FilterSchema, SeveritySchema } from '../schemas/finding.schema'
-import { findings } from '../mocks/data/findings'
-import { SEVERITY_ORDER } from '../lib/constants'
+import { filterFindings, readFilters } from '@/lib/findings-filter'
+import { FilterSchema, SeveritySchema } from '@/schemas/finding.schema'
+import { findings } from '@/mocks/data/findings'
+import { SEVERITY_ORDER } from '@/lib/constants'
 
 const defaults = FilterSchema.parse({})
 describe('filterFindings', () => {

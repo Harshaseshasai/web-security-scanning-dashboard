@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { useAuthStore } from '../store/auth.store'
+import { useAuthStore } from '@/store/auth.store'
 import { ErrorSchema } from '../schemas/auth.schema'
 
 let useDemoTransport = !import.meta.env.DEV && import.meta.env.VITE_LIVE_API !== 'true'

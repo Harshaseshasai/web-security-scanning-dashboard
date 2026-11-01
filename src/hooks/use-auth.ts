@@ -4,10 +4,10 @@ import {
   AuthConfigSchema,
   SessionSchema,
   WorkspaceSchema,
-} from '../schemas/auth.schema'
-import { api } from '../lib/api'
-import { useAuthStore } from '../store/auth.store'
-import type { Login } from '../types'
+} from '@/schemas/auth.schema'
+import { api } from '@/lib/api'
+import { useAuthStore } from '@/store/auth.store'
+import type { Login } from '@/types'
 
 /** Validates credentials, authenticates through the mock API, and commits the returned session. */
 export function useLogin() {

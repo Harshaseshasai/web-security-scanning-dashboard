@@ -1,19 +1,20 @@
 import { useState } from 'react'
-import { useDeleteTarget } from '../hooks/use-target-mutations'
+import { useDeleteTarget } from '@/hooks/use-target-mutations'
 import { LockKeyhole, Pencil, Plus, ScanLine, Search, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { PageHeader } from '../components/layout/PageHeader'
-import { Button } from '../components/ui/Button'
-import { EnvironmentBadge } from '../components/ui/Badges'
-import { EmptyState, ErrorState, TableSkeleton } from '../components/ui/DataState'
-import { Modal } from '../components/ui/Modal'
-import { Reveal } from '../components/ui/Reveal'
-import { IconHint } from '../components/ui/Tooltip'
-import { useTargets, useFindings } from '../hooks/use-data'
-import { useUiStore } from '../store/ui.store'
-import { hostname, relativeTime } from '../lib/utils'
-import { CONTENT } from '../config/content'
-import type { Target } from '../types'
+import { PageHeader } from '@/components/layout/PageHeader'
+import { Button } from '@/components/ui/Button'
+import { EnvironmentBadge } from '@/components/ui/Badges'
+import { EmptyState, ErrorState, TableSkeleton } from '@/components/ui/DataState'
+import { Modal } from '@/components/ui/Modal'
+import { Reveal } from '@/components/ui/Reveal'
+import { IconHint } from '@/components/ui/Tooltip'
+import { useTargets, useFindings } from '@/hooks/use-data'
+import { useUiStore } from '@/store/ui.store'
+import { hostname, relativeTime } from '@/lib/utils'
+import { CONTENT } from '@/config/content'
+import type { Target } from '@/types'
+import { Select } from '@/components/ui/Select'
 
 /** Manages the authorized target register, filtering, and reversible deletion. */
 export default function TargetsPage() {
@@ -77,21 +78,19 @@ export default function TargetsPage() {
         <label htmlFor="environment-filter" className="sr-only">
           {CONTENT.targets.environmentLabel}
         </label>
-        <select
-          className="filter-button"
+        <Select
           id="environment-filter"
+          label={CONTENT.targets.environmentLabel}
+          placeholder={CONTENT.targets.allEnvironments}
+          options={[
+            { value: 'all', label: CONTENT.targets.allEnvironments },
+            ...Object.entries(CONTENT.environments).map(([value, label]) => ({ value, label })),
+          ]}
           value={environment}
-          onChange={(event) => {
-            setEnvironment(event.target.value)
+          onChange={(value) => {
+            setEnvironment(value)
           }}
-        >
-          <option value="all">{CONTENT.targets.allEnvironments}</option>
-          {Object.entries(CONTENT.environments).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+        />
         <span className="table-summary">
           {filtered.length} {CONTENT.targets.summary}
         </span>

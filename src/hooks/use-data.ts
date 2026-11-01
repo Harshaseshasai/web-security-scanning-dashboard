@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
-import { api } from '../lib/api'
-import { TargetSchema } from '../schemas/target.schema'
-import { ScanSchema } from '../schemas/scan.schema'
-import { FindingSchema } from '../schemas/finding.schema'
-import { ReportSchema } from '../schemas/report.schema'
-import { useFindingStore } from '../store/findings-filter.store'
-import { FindingQueryResponseSchema } from '../schemas/finding.schema'
-import type { Filters } from '../types'
+import { api } from '@/lib/api'
+import { filterFindings } from '@/lib/findings-filter'
+import { TargetSchema } from '@/schemas/target.schema'
+import { ScanSchema } from '@/schemas/scan.schema'
+import { FindingSchema } from '@/schemas/finding.schema'
+import { ReportSchema } from '@/schemas/report.schema'
+import { useFindingStore } from '@/store/findings-filter.store'
+import type { Filters } from '@/types'
 
 /** Caches and validates the authorized target register. */
 export const useTargets = () =>
@@ -42,40 +42,21 @@ export function useFindings() {
     })),
   }
 }
-/**
- * Sends search, multi-filter, sort, and pagination to the mock API.
- * The response is strictly validated before the table receives a row.
- */
+/** Applies shareable search, filters, sorting, and pagination to the contract findings list. */
 export function useFindingsQuery(filters: Filters) {
-  const overrides = useFindingStore((state) => state.overrides)
-  const params = new URLSearchParams()
-  if (filters.search.length > 0) params.set('search', filters.search)
-  if (filters.severity.length > 0) params.set('severity', filters.severity.join(','))
-  if (filters.category.length > 0) params.set('category', filters.category.join(','))
-  if (filters.status.length > 0) params.set('status', filters.status.join(','))
-  if (filters.target.length > 0) params.set('target', filters.target)
-  if (filters.scan.length > 0) params.set('scan', filters.scan)
-  if (filters.sort.length > 0) params.set('sort', filters.sort)
-  if (filters.direction !== 'none') params.set('direction', filters.direction)
-  params.set('page', String(filters.page))
-  params.set('pageSize', String(filters.pageSize))
-  const query = useQuery({
-    queryKey: ['findings', 'query', filters],
-    queryFn: ({ signal }) =>
-      api(`/findings/query?${params.toString()}`, FindingQueryResponseSchema, { signal }),
-    placeholderData: (previous) => previous,
-  })
+  const query = useFindings()
+  const result = query.data === undefined ? undefined : filterFindings(query.data, filters)
   return {
     ...query,
+    all: query.data,
     data:
-      query.data === undefined
+      result === undefined
         ? undefined
         : {
-            ...query.data,
-            items: query.data.items.map((finding) => ({
-              ...finding,
-              status: overrides[finding.id] ?? finding.status,
-            })),
+            items: result.rows,
+            total: result.total,
+            page: filters.page,
+            pageSize: filters.pageSize,
           },
   }
 }
