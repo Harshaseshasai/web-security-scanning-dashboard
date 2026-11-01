@@ -212,8 +212,7 @@ export const CONTENT = {
       full: 'Full security assessment',
       quick: 'Quick vulnerability scan',
       api: 'API security scan',
-      profileHelp:
-        'Checks the OWASP Top 10, security headers, and exposed services.',
+      profileHelp: 'Checks the OWASP Top 10, security headers, and exposed services.',
       notice:
         'Scans run in a safe, non-destructive mode. This demo simulates a scan without making requests to your target.',
       authorization: 'I am authorized to test this target.',

@@ -77,8 +77,9 @@ export function ReportForm({ onClose }: { onClose: () => void }) {
         <select id="report-scan" name="scanId">
           {completed.map((scan) => (
             <option key={scan.id} value={scan.id}>
-              {targets.data?.find((target) => target.id === scan.targetId)?.name ?? scan.targetId} /{' '}
-              {scan.id}
+              {targets.data?.find((target) => target.id === scan.targetId)?.name ??
+                'Archived target'}{' '}
+              / {scan.id}
             </option>
           ))}
         </select>

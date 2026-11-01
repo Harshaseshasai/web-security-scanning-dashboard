@@ -4,14 +4,7 @@
  * own status copy or invent a second variant of the same status.
  */
 export type StatusTone = 'neutral' | 'info' | 'success' | 'danger' | 'warning'
-export type StatusMark =
-  | 'spinner'
-  | 'check'
-  | 'cross'
-  | 'clock'
-  | 'dot'
-  | 'badge-check'
-  | 'slash'
+export type StatusMark = 'spinner' | 'check' | 'cross' | 'clock' | 'dot' | 'badge-check' | 'slash'
 
 export type StatusPresentation = {
   label: string

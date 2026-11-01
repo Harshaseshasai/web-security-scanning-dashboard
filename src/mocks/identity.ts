@@ -11,7 +11,7 @@ export const MOCK_AUTH_TOKEN = 'mock-jwt-token-demo'
 export const mockUser = UserSchema.parse({
   id: DEMO_USER_ID,
   name: 'John Doe',
-  email: 'john.doe@example.com',
+  email: 'demo@example.com',
   role: 'Security analyst',
 })
 

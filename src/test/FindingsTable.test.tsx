@@ -20,22 +20,22 @@ const defaults = {
 describe('FindingsTable', () => {
   it('renders 20 rows and textual severity labels', () => {
     renderView(<FindingsTable {...defaults} />)
-    expect(screen.getAllByRole('row', { name: /^View / })).toHaveLength(20)
+    expect(screen.getAllByRole('row', { name: /^Open finding/ })).toHaveLength(20)
     expect(screen.getAllByLabelText('Severity: Critical')).toHaveLength(4)
   })
   it('navigates from a row click', async () => {
     renderView(<FindingsTable {...defaults} />)
-    await userEvent.click(screen.getAllByRole('row', { name: /^View / })[0])
-    expect(screen.getByTestId('location')).toHaveTextContent('/findings/FND-1048')
+    await userEvent.click(screen.getAllByRole('row', { name: /^Open finding/ })[0])
+    expect(screen.getByTestId('location')).toHaveTextContent('/findings/fnd_5231')
   })
   it.each(['Enter', ' '])('navigates from the %s key', (key) => {
     renderView(<FindingsTable {...defaults} />)
-    fireEvent.keyDown(screen.getAllByRole('row', { name: /^View / })[0], { key })
-    expect(screen.getByTestId('location')).toHaveTextContent('/findings/FND-1048')
+    fireEvent.keyDown(screen.getAllByRole('row', { name: /^Open finding/ })[0], { key })
+    expect(screen.getByTestId('location')).toHaveTextContent('/findings/fnd_5231')
   })
   it('does not navigate on unrelated keys', () => {
     renderView(<FindingsTable {...defaults} />)
-    fireEvent.keyDown(screen.getAllByRole('row', { name: /^View / })[0], { key: 'Escape' })
+    fireEvent.keyDown(screen.getAllByRole('row', { name: /^Open finding/ })[0], { key: 'Escape' })
     expect(screen.getByTestId('location')).toHaveTextContent('/')
   })
   it('exposes sort state and triggers sort buttons', async () => {
@@ -121,14 +121,14 @@ describe('FindingsTable', () => {
   it('selects a row without navigating', async () => {
     const onSelect = vi.fn()
     renderView(<FindingsTable {...defaults} onSelect={onSelect} />)
-    await userEvent.click(screen.getByLabelText('Select FND-1048'))
-    expect(onSelect).toHaveBeenCalledWith(['FND-1048'])
+    await userEvent.click(screen.getByLabelText('Select fnd_5231'))
+    expect(onSelect).toHaveBeenCalledWith(['fnd_5231'])
     expect(screen.getByTestId('location')).toHaveTextContent('/')
   })
   it('deselects a row without navigating', async () => {
     const onSelect = vi.fn()
-    renderView(<FindingsTable {...defaults} selected={['FND-1048']} onSelect={onSelect} />)
-    await userEvent.click(screen.getByLabelText('Select FND-1048'))
+    renderView(<FindingsTable {...defaults} selected={['fnd_5231']} onSelect={onSelect} />)
+    await userEvent.click(screen.getByLabelText('Select fnd_5231'))
     expect(onSelect).toHaveBeenCalledWith([])
   })
   it('selects all visible rows', async () => {
@@ -151,13 +151,15 @@ describe('FindingsTable', () => {
   })
   it('does not hijack a checkbox keyboard event', () => {
     renderView(<FindingsTable {...defaults} />)
-    fireEvent.keyDown(screen.getByLabelText('Select FND-1048'), { key: ' ' })
+    fireEvent.keyDown(screen.getByLabelText('Select fnd_5231'), { key: ' ' })
     expect(screen.getByTestId('location')).toHaveTextContent('/')
   })
   it('uses finding location when a target is archived', () => {
     renderView(<FindingsTable {...defaults} targets={[]} />)
     expect(
-      within(screen.getAllByRole('row', { name: /^View / })[0]).getByText('app.westhaven.example')
+      within(screen.getAllByRole('row', { name: /^Open finding/ })[0]).getByText(
+        'www.westhaven.example'
+      )
     ).toBeInTheDocument()
   })
 })

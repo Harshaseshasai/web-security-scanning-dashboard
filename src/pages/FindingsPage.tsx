@@ -162,7 +162,10 @@ export default function FindingsPage() {
         />
         <FilterMenu
           label="Status"
-          options={Object.entries(FINDING_STATUS_CONFIG).map(([value, config]) => ({ value, label: config.label }))}
+          options={Object.entries(FINDING_STATUS_CONFIG).map(([value, config]) => ({
+            value,
+            label: config.label,
+          }))}
           selected={filters.status}
           onChange={(values) => {
             setFilter('status', values)
@@ -199,7 +202,9 @@ export default function FindingsPage() {
             {CONTENT.findings.clear}
           </Button>
         )}
-        <span className="table-summary">{total} {CONTENT.findings.results}</span>
+        <span className="table-summary">
+          {total} {CONTENT.findings.results}
+        </span>
       </div>
       {filters.scan && (
         <div className="form-notice" style={{ marginBottom: 15 }}>
@@ -219,7 +224,9 @@ export default function FindingsPage() {
       <section className="panel">
         {selected.length > 0 && (
           <div className="selected-toolbar">
-            <span>{selected.length} {CONTENT.findings.selected}</span>
+            <span>
+              {selected.length} {CONTENT.findings.selected}
+            </span>
             <Button small onClick={confirmSelection} disabled={confirmableCount === 0}>
               <CheckCheck size={12} />
               {CONTENT.findings.confirmSelection}

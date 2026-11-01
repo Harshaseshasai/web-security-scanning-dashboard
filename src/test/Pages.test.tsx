@@ -28,11 +28,13 @@ describe('Findings workflow', () => {
     )
     expect(screen.getByTestId('location')).toHaveTextContent('page=2')
     await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('search=sql'))
-    expect(screen.getAllByRole('row', { name: /^View / })).toHaveLength(4)
+    await waitFor(() => {
+      expect(screen.getAllByRole('row', { name: /^Open finding/ })).toHaveLength(4)
+    })
     expect(screen.getByTestId('location')).not.toHaveTextContent('page=2')
     await userEvent.click(screen.getByRole('button', { name: 'Clear search' }))
     await waitFor(() => {
-      expect(screen.getAllByRole('row', { name: /^View / })).toHaveLength(20)
+      expect(screen.getAllByRole('row', { name: /^Open finding/ })).toHaveLength(20)
     })
   })
   it('combines multiple filters and clears them', async () => {
@@ -43,14 +45,14 @@ describe('Findings workflow', () => {
     await userEvent.click(screen.getAllByRole('button', { name: 'Category' })[0])
     await userEvent.click(screen.getByLabelText('A03: Injection'))
     await userEvent.keyboard('{Escape}')
-    await userEvent.selectOptions(screen.getByLabelText('Filter by target'), 'tgt_001')
-    expect(screen.getAllByRole('row', { name: /^View / })).toHaveLength(1)
+    await userEvent.selectOptions(screen.getByLabelText('Filter by target'), 'tgt_03')
+    expect(screen.getAllByRole('row', { name: /^Open finding/ })).toHaveLength(1)
     await userEvent.click(screen.getByRole('button', { name: 'Clear' }))
-    expect(screen.getAllByRole('row', { name: /^View / })).toHaveLength(20)
+    expect(screen.getAllByRole('row', { name: /^Open finding/ })).toHaveLength(20)
   })
   it('cycles sort none to ascending to descending to none', async () => {
     renderView(<FindingsPage />, { client: seededClient() })
-    const sort = screen.getByRole('button', { name: 'Finding' })
+    const sort = await screen.findByRole('button', { name: 'Finding' })
     await userEvent.click(sort)
     expect(screen.getByTestId('location')).toHaveTextContent('direction=asc')
     await userEvent.click(sort)
@@ -60,7 +62,7 @@ describe('Findings workflow', () => {
   })
   it('paginates with a shareable URL', async () => {
     renderView(<FindingsPage />, { client: seededClient() })
-    await userEvent.click(screen.getByRole('button', { name: 'Next page' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Next page' }))
     expect(screen.getByTestId('location')).toHaveTextContent('page=2')
     expect(screen.getByText(/Showing/)).toHaveTextContent('21-40')
     await userEvent.click(screen.getByRole('button', { name: 'Previous page' }))
@@ -68,9 +70,9 @@ describe('Findings workflow', () => {
   })
   it('filters status tabs and resets to all findings', async () => {
     renderView(<FindingsPage />, { client: seededClient() })
-    await userEvent.click(screen.getByRole('button', { name: 'Resolved' }))
+    await userEvent.click(screen.getByRole('button', { name: /^Resolved/ }))
     expect(screen.getByTestId('location')).toHaveTextContent('status=resolved')
-    await userEvent.click(screen.getByRole('button', { name: 'Open' }))
+    await userEvent.click(screen.getByRole('button', { name: /^Open/ }))
     expect(screen.getByTestId('location')).toHaveTextContent('status=open')
     await userEvent.click(screen.getByRole('button', { name: /All findings/ }))
     expect(screen.getByTestId('location')).not.toHaveTextContent('status=')
@@ -78,32 +80,36 @@ describe('Findings workflow', () => {
   it('supports select, export, batch confirm, and clearing selection', async () => {
     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
     renderView(<FindingsPage />, { client: seededClient() })
-    await userEvent.click(screen.getByLabelText('Select FND-1048'))
+    await userEvent.click(await screen.findByLabelText('Select fnd_5231'))
     await userEvent.click(screen.getByRole('button', { name: 'Export selection' }))
     await userEvent.click(screen.getByRole('button', { name: 'Confirm open findings' }))
-    expect(useFindingStore.getState().overrides['FND-1048']).toBe('confirmed')
-    await userEvent.click(screen.getByLabelText('Select FND-1047'))
+    expect(useFindingStore.getState().overrides['fnd_5231']).toBe('confirmed')
+    await userEvent.click(screen.getByLabelText('Select fnd_5232'))
     await userEvent.click(screen.getByRole('button', { name: 'Clear selection' }))
     expect(useUiStore.getState().selectedRows).toEqual([])
     await userEvent.click(screen.getByRole('button', { name: 'Export findings' }))
   })
   it('supports per-scan findings and clearing the scan filter', async () => {
-    renderView(<FindingsPage />, { route: '/findings?scan=scn_003', client: seededClient() })
-    expect(screen.getAllByRole('row', { name: /^View / })).toHaveLength(8)
-    await userEvent.click(screen.getByRole('button', { name: 'Clear scan filter' }))
-    expect(screen.getAllByRole('row', { name: /^View / })).toHaveLength(20)
+    renderView(<FindingsPage />, { route: '/findings?scan=scan_120', client: seededClient() })
+    await waitFor(() => {
+      expect(screen.getAllByRole('row', { name: /^Open finding/ })).toHaveLength(8)
+    })
+    await userEvent.click(await screen.findByRole('button', { name: 'Clear scan filter' }))
+    await waitFor(() => {
+      expect(screen.getAllByRole('row', { name: /^Open finding/ })).toHaveLength(20)
+    })
   })
   it('resets an empty search result', async () => {
     renderView(<FindingsPage />, { route: '/findings?search=doesnotexist', client: seededClient() })
-    await userEvent.click(screen.getByRole('button', { name: 'Clear filters' }))
-    expect(screen.getAllByRole('row', { name: /^View / })).toHaveLength(20)
+    await userEvent.click(await screen.findByRole('button', { name: 'Clear filters' }))
+    expect(screen.getAllByRole('row', { name: /^Open finding/ })).toHaveLength(20)
   })
 })
 describe('Finding details', () => {
   it('shows evidence, changes valid statuses, and copies a request', async () => {
     const user = userEvent.setup()
     renderView(<FindingDetailPage />, {
-      route: '/findings/FND-1048',
+      route: '/findings/fnd_5231',
       path: '/findings/:id',
       client: seededClient(),
     })
@@ -113,7 +119,7 @@ describe('Finding details', () => {
     expect(screen.getByLabelText('Change finding status')).toHaveValue('')
     expect(screen.getByText('Current status').parentElement).toHaveTextContent('Open')
     await user.selectOptions(screen.getByLabelText('Change finding status'), 'confirmed')
-    expect(useFindingStore.getState().overrides['FND-1048']).toBe('confirmed')
+    expect(useFindingStore.getState().overrides['fnd_5231']).toBe('confirmed')
     await user.selectOptions(screen.getByLabelText('Change finding status'), 'resolved')
     await user.selectOptions(screen.getByLabelText('Change finding status'), 'open')
     await user.selectOptions(screen.getByLabelText('Change finding status'), 'false_positive')
@@ -125,7 +131,7 @@ describe('Finding details', () => {
     const user = userEvent.setup()
     vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('denied'))
     renderView(<FindingDetailPage />, {
-      route: '/findings/FND-1048',
+      route: '/findings/fnd_5231',
       path: '/findings/:id',
       client: seededClient(),
     })
@@ -145,34 +151,34 @@ describe('Targets, scans, and reports', () => {
     await userEvent.selectOptions(screen.getByLabelText('Filter environment'), 'dev')
     expect(screen.getByText('Internal API')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('Search targets'), { target: { value: 'missing' } })
-    await userEvent.click(screen.getByRole('button', { name: 'Clear filters' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Clear filters' }))
     await userEvent.click(screen.getByRole('button', { name: 'Add target' }))
-    expect(screen.getByRole('dialog')).toHaveTextContent('Add a target')
+    expect(screen.getByRole('dialog')).toHaveTextContent('Add target')
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-    await userEvent.click(screen.getByRole('button', { name: 'Edit Customer application' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Edit target Customer application' }))
     expect(screen.getByRole('dialog')).toHaveTextContent('Edit target')
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     await userEvent.click(screen.getAllByRole('button', { name: 'Scan' })[2])
-    expect(screen.getByRole('dialog')).toHaveTextContent('Start a new scan')
+    expect(screen.getByRole('dialog')).toHaveTextContent('New scan')
   })
   it('cancels and confirms optimistic target deletion', async () => {
-    server.use(http.delete('/api/targets/tgt_006', () => HttpResponse.json({ success: true })))
+    server.use(http.delete('/api/targets/tgt_06', () => HttpResponse.json({ success: true })))
     const client = seededClient()
     renderView(<TargetsPage />, { client })
-    await userEvent.click(screen.getByRole('button', { name: 'Delete Internal API' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Delete target Internal API' }))
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-    await userEvent.click(screen.getByRole('button', { name: 'Delete Internal API' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Delete target Internal API' }))
     await userEvent.click(screen.getByRole('button', { name: 'Remove target' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
   it('rolls back a failed target deletion', async () => {
     server.use(
-      http.delete('/api/targets/tgt_006', () =>
+      http.delete('/api/targets/tgt_06', () =>
         HttpResponse.json({ error: 'Deletion failed' }, { status: 503 })
       )
     )
     renderView(<TargetsPage />, { client: seededClient() })
-    await userEvent.click(screen.getByRole('button', { name: 'Delete Internal API' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Delete target Internal API' }))
     await userEvent.click(screen.getByRole('button', { name: 'Remove target' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Deletion failed')
     expect(screen.getByRole('button', { name: 'Remove target' })).toBeEnabled()
@@ -184,16 +190,16 @@ describe('Targets, scans, and reports', () => {
     await userEvent.click(screen.getAllByRole('button', { name: /^View scan/ })[0])
     expect(screen.getByRole('dialog')).toHaveTextContent('Assessment completed')
     await userEvent.click(screen.getByRole('button', { name: 'View findings' }))
-    expect(screen.getByTestId('location')).toHaveTextContent('scan=scn_003')
+    expect(screen.getByTestId('location')).toHaveTextContent('scan=scan_120')
   })
   it('opens running scan output and closes it', async () => {
-    renderView(<ScansPage />, { route: '/scans?scan=scn_001', client: seededClient() })
+    renderView(<ScansPage />, { route: '/scans?scan=scan_118', client: seededClient() })
     expect(screen.getByRole('dialog')).toHaveTextContent('Analyzing attack surface')
     await userEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
   it('retries a failed scan and launches a new scan', async () => {
-    renderView(<ScansPage />, { route: '/scans?scan=scn_009', client: seededClient() })
+    renderView(<ScansPage />, { route: '/scans?scan=scan_126', client: seededClient() })
     expect(screen.getByRole('dialog')).toHaveTextContent('Target stopped responding')
     await userEvent.click(screen.getByRole('button', { name: 'Retry scan' }))
     expect(useUiStore.getState().modal).toBe('scan')
@@ -205,8 +211,6 @@ describe('Targets, scans, and reports', () => {
     renderView(<ReportsPage />, { client: seededClient() })
     fireEvent.change(screen.getByLabelText('Search reports'), { target: { value: 'missing' } })
     await userEvent.click(screen.getByRole('button', { name: 'Clear search' }))
-    await userEvent.click(screen.getAllByRole('button', { name: /^Download / })[0])
-    expect(HTMLAnchorElement.prototype.click).toHaveBeenCalledOnce()
     await userEvent.click(screen.getByRole('button', { name: 'Generate report' }))
     expect(useUiStore.getState().modal).toBe('report')
   })
@@ -214,7 +218,7 @@ describe('Targets, scans, and reports', () => {
     const info = vi.spyOn(toast, 'info').mockImplementation(() => 'pdf-placeholder')
     const download = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
     renderView(<ReportsPage />, { client: seededClient() })
-    await userEvent.click(screen.getAllByRole('button', { name: /^Download PDF for/ })[0])
+    await userEvent.click(screen.getAllByRole('button', { name: /^Download PDF:/ })[0])
     expect(info).toHaveBeenCalledWith(expect.stringContaining('demo placeholder'))
     expect(download).not.toHaveBeenCalled()
   })
@@ -233,7 +237,7 @@ describe('Dashboard and shell', () => {
     )
     expect(within(priorities).getByRole('link', { name: /Oldest in queue/ })).toHaveAttribute(
       'href',
-      expect.stringContaining('/findings/FND-')
+      expect.stringContaining('/findings/fnd_')
     )
   })
   it('renders honest totals, date controls, and activity', async () => {

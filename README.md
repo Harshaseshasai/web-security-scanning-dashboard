@@ -73,10 +73,10 @@ The app opens at login. Use the demo account or the "Enter demo workspace" butto
 - Vite 7 and Tailwind 4 are host requirements. All supplied OKLCH tokens are preserved; severity extensions use Tailwind 4's `@theme` rather than a v3 configuration file.
 - MSW is imported only in development. Static preview builds use the same in-memory service through a documented demo transport, but still require explicit sign-in. Set `VITE_LIVE_API=true` when supplying a real backend.
 - The first report-generation request intentionally returns 503. The persistent inline error and enabled retry control are expected behavior, not a broken feature.
-- HTML, JSON, and CSV downloads are real. The "Download PDF" action is an explicit demo placeholder with an explanatory toast; HTML can be printed to PDF using the browser. Server-side PDF generation is not implemented.
+- The "Download PDF" action is an explicit demo placeholder with an explanatory toast; HTML can be printed to PDF using the browser. Server-side PDF generation is not implemented. Findings can be exported as CSV.
 - Dataset dates are anchored to October 31, 2026, for reproducible demos. Dashboard totals, severity counts, and historical chart series are computed from the same 48 findings, not unrelated marketing metrics.
 - Target credentials are validated, consumed, and discarded. Finding status overrides reset on reload or sign-out. Mock entity changes reset when the page is reloaded.
 - The preserved single-file Vite configuration prevents effective route code-splitting. The current artifact exceeds the requested 200 KB gzip initial budget; LCP under fast 3G is not certified. See `docs/PROD.md`.
 - Client-side guards and mock tokens are not production authentication. Do not deploy this demo as a real scanner or use real credentials.
 
-See [Architecture](docs/ARCHITECTURE.md), [Design](docs/DESIGN.md), [Interface audit](docs/UI-AUDIT.md), [Decisions](docs/DECISIONS.md), [Trade-offs](docs/DOUBLE-DOWN.md), and [Production](docs/PROD.md).
+See [Architecture](docs/ARCHITECTURE.md) ([detailed pages](docs/architecture/README.md)), [Design](docs/DESIGN.md), [Interface audit](docs/UI-AUDIT.md), [Decisions](docs/DECISIONS.md), [Trade-offs](docs/DOUBLE-DOWN.md), and [Production](docs/PROD.md).

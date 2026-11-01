@@ -6,9 +6,7 @@ import { findings } from './findings'
 export const scans = z.array(ScanSchema).parse(
   Array.from({ length: 12 }, (_, i) => {
     const status = i === 0 ? 'running' : i === 1 ? 'queued' : i === 8 ? 'failed' : 'completed'
-    const scanFindings = findings.filter(
-      (finding) => finding.scanId === `scan_${String(118 + i)}`
-    )
+    const scanFindings = findings.filter((finding) => finding.scanId === `scan_${String(118 + i)}`)
     return {
       id: `scan_${String(118 + i)}`,
       targetId: targets[i % targets.length].id,

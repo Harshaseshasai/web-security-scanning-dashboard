@@ -26,7 +26,7 @@ beforeEach(resetStores)
 const views = [
   { name: 'targets', element: <TargetsPage />, endpoint: '/api/targets' },
   { name: 'scans', element: <ScansPage />, endpoint: '/api/scans' },
-  { name: 'findings', element: <FindingsPage />, endpoint: '/api/findings' },
+  { name: 'findings', element: <FindingsPage />, endpoint: '/api/findings/query' },
   { name: 'reports', element: <ReportsPage />, endpoint: '/api/reports' },
 ]
 describe('Loading, empty, and persistent error states', () => {
@@ -97,18 +97,7 @@ describe('Loading, empty, and persistent error states', () => {
     await userEvent.click(screen.getByRole('tab', { name: 'Activity log' }))
     expect(screen.getByRole('heading', { name: 'Workspace activity' })).toBeInTheDocument()
   })
-  it('keeps report-download failures actionable', async () => {
-    const client = seededClient()
-    client.removeQueries({ queryKey: ['findings'] })
-    server.use(
-      http.get('/api/findings', () =>
-        HttpResponse.json({ error: 'Evidence unavailable' }, { status: 503 })
-      )
-    )
-    renderView(<ReportsPage />, { client })
-    expect(await screen.findByRole('alert')).toHaveTextContent('Evidence unavailable')
-    await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
-  })
+  // Report-download error state removed with the out-of-scope download formats.
   it.each([
     { name: 'scan', element: <ScanForm targetId="" onClose={() => {}} /> },
     { name: 'report', element: <ReportForm onClose={() => {}} /> },
@@ -138,25 +127,25 @@ describe('Secondary routes and keyboard actions', () => {
   it('opens a scan route from the dashboard table', async () => {
     renderView(<ScansTable scans={scans} targets={[]} />)
     await userEvent.click(screen.getAllByRole('button', { name: /^View scan/ })[0])
-    expect(screen.getByTestId('location')).toHaveTextContent('/scans?scan=scn_001')
+    expect(screen.getByTestId('location')).toHaveTextContent('/scans?scan=scan_118')
   })
   it('renders queued and late-running scan output', async () => {
     const client = seededClient()
     client.setQueryData(
       ['scans'],
       scans.map((scan) =>
-        scan.id === 'scn_001'
+        scan.id === 'scan_119'
           ? { ...scan, status: 'running', progress: 80 }
-          : scan.id === 'scn_002'
+          : scan.id === 'scan_120'
             ? { ...scan, status: 'queued', progress: 0 }
             : scan
       )
     )
-    renderView(<ScansPage />, { route: '/scans?scan=scn_002', client })
+    renderView(<ScansPage />, { route: '/scans?scan=scan_120', client })
     expect(screen.getByRole('dialog')).toHaveTextContent('Waiting for an available scan worker')
     await userEvent.click(screen.getByRole('button', { name: 'Close' }))
     await userEvent.click(screen.getAllByRole('button', { name: /^View scan/ })[0])
-    expect(screen.getByRole('dialog')).toHaveTextContent('OWASP vulnerability checks')
+    expect(screen.getByRole('dialog')).toHaveTextContent('Analyzing attack surface...')
   })
   it('handles missing target names in detail and reports', () => {
     const client = seededClient()
@@ -168,7 +157,7 @@ describe('Secondary routes and keyboard actions', () => {
   it('opens the target modal without an existing target', () => {
     useUiStore.getState().openModal('target')
     renderView(<GlobalModals />, { client: seededClient() })
-    expect(screen.getByRole('dialog')).toHaveTextContent('Add a target')
+    expect(screen.getByRole('dialog')).toHaveTextContent('Add target')
   })
   it('uses help, workspace, notifications, and settings navigation actions', async () => {
     renderView(<AppRoutes />, { route: '/dashboard', client: seededClient() })

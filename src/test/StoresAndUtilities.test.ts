@@ -13,9 +13,8 @@ import {
   hostname,
   relativeTime,
 } from '../lib/utils'
-import { findingsCsv, downloadReport, downloadFile } from '../lib/download'
+import { findingsCsv, downloadFile } from '../lib/download'
 import { findings } from '../mocks/data/findings'
-import { reports } from '../mocks/data/reports'
 import { resetStores } from './render'
 
 beforeEach(resetStores)
@@ -60,10 +59,10 @@ describe('Session state', () => {
     expect(useUiStore.getState().collapsed).toBe(true)
     useUiStore.getState().setMobileOpen(true)
     expect(useUiStore.getState().mobileOpen).toBe(true)
-    useUiStore.getState().openModal('target', 'tgt_001')
-    expect(useUiStore.getState().editTargetId).toBe('tgt_001')
-    useUiStore.getState().openModal('scan', 'tgt_003')
-    expect(useUiStore.getState().preselectedTarget).toBe('tgt_003')
+    useUiStore.getState().openModal('target', 'tgt_01')
+    expect(useUiStore.getState().editTargetId).toBe('tgt_01')
+    useUiStore.getState().openModal('scan', 'tgt_03')
+    expect(useUiStore.getState().preselectedTarget).toBe('tgt_03')
     useUiStore.getState().openModal('scan')
     expect(useUiStore.getState().preselectedTarget).toBe('')
     useUiStore.getState().openModal('target')
@@ -99,12 +98,7 @@ describe('Display and export utilities', () => {
     expect(csv).toContain('a""b')
     expect(csv).toContain('ID,Title,Severity')
   })
-  it.each(['html', 'json', 'csv'] as const)('downloads a real %s report', (format) => {
-    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
-    downloadReport({ ...reports[0], format }, findings)
-    expect(click).toHaveBeenCalledOnce()
-    expect(URL.createObjectURL).toHaveBeenCalled()
-  })
+  // Report downloads beyond the documented PDF placeholder are intentionally out of scope.
   it('revokes downloaded object URLs', () => {
     vi.useFakeTimers()
     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})

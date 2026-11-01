@@ -54,7 +54,10 @@ export function AppHeader() {
   return (
     <header className="app-header">
       <div className="header-left">
-        <IconHint label={collapsed ? CONTENT.navigation.expandSidebar : CONTENT.navigation.collapseSidebar} side="bottom">
+        <IconHint
+          label={collapsed ? CONTENT.navigation.expandSidebar : CONTENT.navigation.collapseSidebar}
+          side="bottom"
+        >
           <button
             className="icon-button desktop-toggle"
             aria-label={CONTENT.navigation.toggleSidebar}

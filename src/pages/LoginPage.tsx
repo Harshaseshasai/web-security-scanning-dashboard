@@ -127,7 +127,9 @@ export default function LoginPage() {
                 </span>
               )}
               {demo.isLoading && <span className="muted">{CONTENT.auth.loadingDemo}</span>}
-              {demo.isError && <span className="text-danger">{CONTENT.auth.credentialUnavailable}</span>}
+              {demo.isError && (
+                <span className="text-danger">{CONTENT.auth.credentialUnavailable}</span>
+              )}
             </p>
             <Button
               type="button"

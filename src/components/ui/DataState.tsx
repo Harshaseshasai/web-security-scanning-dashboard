@@ -29,14 +29,14 @@ export function EmptyState({
   title?: string
   description?: string
   action?: string
-  onAction: () => void
+  onAction?: () => void
 }) {
   return (
     <div className="empty-state" aria-label={title}>
       <SearchX className="empty-illustration" size={27} strokeWidth={1.3} aria-hidden="true" />
       <h3>{title}</h3>
       <p>{description}</p>
-      <Button onClick={onAction}>{action}</Button>
+      {onAction ? <Button onClick={onAction}>{action}</Button> : null}
     </div>
   )
 }

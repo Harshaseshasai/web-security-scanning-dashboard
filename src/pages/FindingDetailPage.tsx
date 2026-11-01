@@ -76,7 +76,11 @@ export default function FindingDetailPage() {
                   {(['request', 'response'] as const).map((type) => (
                     <div className="terminal" key={type}>
                       <div className="terminal-heading">
-                        <span className="mono">{type === 'request' ? CONTENT.findingDetail.httpRequest : CONTENT.findingDetail.httpResponse}</span>
+                        <span className="mono">
+                          {type === 'request'
+                            ? CONTENT.findingDetail.httpRequest
+                            : CONTENT.findingDetail.httpResponse}
+                        </span>
                         <IconHint label={`${CONTENT.findingDetail.copy} ${type}`}>
                           <button
                             className="icon-button"
@@ -126,7 +130,9 @@ export default function FindingDetailPage() {
                     onChange={(event) => {
                       const next = FindingStatusSchema.parse(event.target.value)
                       if (setStatus(finding.id, finding.status, next))
-                        toast.success(`${FINDING_STATUS_CONFIG[next].label}: ${FINDING_STATUS_CONFIG[next].description}`)
+                        toast.success(
+                          `${FINDING_STATUS_CONFIG[next].label}: ${FINDING_STATUS_CONFIG[next].description}`
+                        )
                     }}
                   >
                     <option value="" disabled>
@@ -138,9 +144,7 @@ export default function FindingDetailPage() {
                       </option>
                     ))}
                   </select>
-                  <p className="detail-note">
-                    {CONTENT.findingDetail.triageHelp}
-                  </p>
+                  <p className="detail-note">{CONTENT.findingDetail.triageHelp}</p>
                 </section>
                 <section className="detail-section">
                   <h2>{CONTENT.findingDetail.details}</h2>
@@ -150,16 +154,26 @@ export default function FindingDetailPage() {
                         label: CONTENT.findingDetail.labels.target,
                         value:
                           targets.data?.find((target) => target.id === finding.targetId)?.name ??
-                          finding.targetId,
+                          'Archived target',
                       },
                       { label: CONTENT.findingDetail.labels.category, value: finding.category },
                       { label: CONTENT.findingDetail.labels.weakness, value: finding.cwe },
                       { label: CONTENT.findingDetail.labels.scanId, value: finding.scanId },
-                      { label: CONTENT.findingDetail.labels.discovered, value: dateLabel(finding.discoveredAt) },
+                      {
+                        label: CONTENT.findingDetail.labels.discovered,
+                        value: dateLabel(finding.discoveredAt),
+                      },
                     ].map(({ label, value }) => (
                       <div key={label} className="property">
                         <dt>{label}</dt>
-                        <dd className={label === CONTENT.findingDetail.labels.weakness || label === CONTENT.findingDetail.labels.scanId ? 'mono' : ''}>
+                        <dd
+                          className={
+                            label === CONTENT.findingDetail.labels.weakness ||
+                            label === CONTENT.findingDetail.labels.scanId
+                              ? 'mono'
+                              : ''
+                          }
+                        >
                           {value}
                         </dd>
                       </div>

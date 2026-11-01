@@ -24,7 +24,8 @@ describe('Strict schema contracts', () => {
     })
     reports.forEach((report) => {
       const scan = scans.find((item) => item.id === report.scanId)
-      expect(scan?.targetId).toBe(report.targetId)
+      const target = targets.find((item) => item.name === report.target)
+      expect(scan?.targetId).toBe(target?.id)
       expect(scan?.status).toBe('completed')
     })
   })

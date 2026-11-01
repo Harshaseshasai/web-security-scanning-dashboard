@@ -1,9 +1,0 @@
-[
-  { "route": "/dashboard", "violations": [] },
-  { "route": "/findings", "violations": [] },
-  { "route": "/targets", "violations": [] },
-  { "route": "/scans", "violations": [] },
-  { "route": "/findings/FND-1048", "violations": [] },
-  { "route": "/reports", "violations": [] },
-  { "route": "/login", "violations": [] }
-]

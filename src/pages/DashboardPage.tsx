@@ -5,6 +5,7 @@ import { CalendarDays, Check, ChevronDown, ScanLine } from 'lucide-react'
 import { PageHeader } from '../components/layout/PageHeader'
 import { Button } from '../components/ui/Button'
 import { EmptyState, ErrorState, TableSkeleton } from '../components/ui/DataState'
+import { Reveal } from '../components/ui/Reveal'
 import { useFindings, useScans, useTargets } from '../hooks/use-data'
 import { useUiStore } from '../store/ui.store'
 import { FindingsChart } from '../components/features/dashboard/FindingsChart'
@@ -120,7 +121,9 @@ export default function DashboardPage() {
               <div className="risk-topline">
                 <span>{CONTENT.dashboard.priorityLabel}</span>
                 <span className="mono muted">
-                  {findings.data ? `${affectedTargets} ${CONTENT.dashboard.targetsAffected}` : CONTENT.dashboard.loadingFindings}
+                  {findings.data
+                    ? `${affectedTargets} ${CONTENT.dashboard.targetsAffected}`
+                    : CONTENT.dashboard.loadingFindings}
                 </span>
               </div>
               <div className="risk-measure">
@@ -171,7 +174,9 @@ export default function DashboardPage() {
                     {scans.data?.length ?? <span className="skeleton" />}
                   </strong>
                   <span className="support-note">
-                    {scans.data ? `${active} ${CONTENT.dashboard.scansActive}` : CONTENT.dashboard.loadingScans}
+                    {scans.data
+                      ? `${active} ${CONTENT.dashboard.scansActive}`
+                      : CONTENT.dashboard.loadingScans}
                   </span>
                 </Link>
                 <Link className="support-metric" to="/targets">
@@ -217,7 +222,7 @@ export default function DashboardPage() {
           ) : (
             <div className="chart-grid">
               <FindingsChart findings={findings.data} days={days} setDays={setDays} />
-              <section className="panel severity-panel" aria-labelledby="severity-heading">
+              <Reveal className="panel severity-panel" aria-labelledby="severity-heading">
                 <div className="panel-heading">
                   <div>
                     <h2 id="severity-heading">{CONTENT.dashboard.severityTitle}</h2>
@@ -259,10 +264,10 @@ export default function DashboardPage() {
                 <Link to="/findings" className="panel-bottom-link">
                   {CONTENT.dashboard.reviewFindings}
                 </Link>
-              </section>
+              </Reveal>
             </div>
           )}
-          <section className="panel recent-scans">
+          <Reveal className="panel recent-scans">
             <div className="panel-heading">
               <div>
                 <h2>{CONTENT.dashboard.recentScans}</h2>
@@ -283,10 +288,10 @@ export default function DashboardPage() {
                 compact
               />
             )}
-          </section>
+          </Reveal>
         </>
       ) : (
-        <section className="panel">
+        <Reveal className="panel">
           <div className="panel-heading" style={{ paddingBottom: 18 }}>
             <h2>{CONTENT.dashboard.activityTitle}</h2>
           </div>
@@ -311,7 +316,7 @@ export default function DashboardPage() {
               </Link>
             ))
           )}
-        </section>
+        </Reveal>
       )}
     </>
   )

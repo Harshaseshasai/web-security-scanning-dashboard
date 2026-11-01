@@ -110,7 +110,7 @@ describe('Target creation and editing', () => {
   it('edits an existing target and validates authenticated credentials', async () => {
     const close = vi.fn()
     server.use(
-      http.put('/api/targets/tgt_001', () =>
+      http.put('/api/targets/tgt_01', () =>
         HttpResponse.json({ ...targets[0], name: 'Updated website' })
       )
     )
@@ -135,7 +135,7 @@ describe('New scan safeguards', () => {
     renderView(<ScanForm targetId="" onClose={vi.fn()} />, { client: seededClient() })
     fireEvent.submit(screen.getByRole('button', { name: 'Start scan' }).closest('form')!)
     expect(screen.getByRole('alert')).toHaveTextContent('Choose a target')
-    await userEvent.selectOptions(screen.getByLabelText('Target'), 'tgt_003')
+    await userEvent.selectOptions(screen.getByLabelText('Target'), 'tgt_03')
     await userEvent.click(screen.getByRole('button', { name: 'Start scan' }))
     expect(screen.getByRole('alert')).toHaveTextContent('Confirm you are authorized')
   })
@@ -147,14 +147,14 @@ describe('New scan safeguards', () => {
         return HttpResponse.json({
           ...scans[0],
           id: 'scan-new',
-          targetId: 'tgt_003',
+          targetId: 'tgt_03',
           status: 'queued',
           progress: 0,
         })
       })
     )
     const close = vi.fn()
-    renderView(<ScanForm targetId="tgt_003" onClose={close} />, { client: seededClient() })
+    renderView(<ScanForm targetId="tgt_03" onClose={close} />, { client: seededClient() })
     await userEvent.click(screen.getByLabelText('I am authorized to test this target.'))
     await userEvent.click(screen.getByRole('button', { name: 'Start scan' }))
     await waitFor(() => {
@@ -169,7 +169,7 @@ describe('New scan safeguards', () => {
         HttpResponse.json({ error: 'Active scan already exists' }, { status: 409 })
       )
     )
-    renderView(<ScanForm targetId="tgt_003" onClose={vi.fn()} />, { client: seededClient() })
+    renderView(<ScanForm targetId="tgt_03" onClose={vi.fn()} />, { client: seededClient() })
     await userEvent.click(screen.getByLabelText('I am authorized to test this target.'))
     await userEvent.click(screen.getByRole('button', { name: 'Start scan' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Active scan already exists')
@@ -230,7 +230,7 @@ describe('Report retry and idempotency', () => {
     )
     renderView(<ReportForm onClose={vi.fn()} />, { client: seededClient() })
     await userEvent.dblClick(screen.getByRole('button', { name: 'Generate report' }))
-    expect(await screen.findByRole('button', { name: 'Generating report...' })).toBeDisabled()
+    expect(await screen.findByRole('button', { name: 'Generating...' })).toBeDisabled()
     expect(request).toHaveBeenCalledOnce()
     await act(async () => {
       finish?.()

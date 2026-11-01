@@ -3,8 +3,6 @@ dist
 coverage
 public/mockServiceWorker.js
 package-lock.json
-.agents
-.claude
-.taste-skill
-.hallmark
 docs/screenshots
+.github
+.husky

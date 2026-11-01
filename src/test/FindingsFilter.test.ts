@@ -32,15 +32,15 @@ describe('filterFindings', () => {
       severity: ['critical'],
       category: ['A03: Injection'],
       status: ['open'],
-      target: 'tgt_001',
+      target: 'tgt_03',
       search: 'sql',
     }
     expect(filterFindings(findings, filters).all).toEqual([findings[0]])
   })
   it('filters by scan ID', () => {
     expect(
-      filterFindings(findings, { ...defaults, scan: 'scn_003' }).all.every(
-        (finding) => finding.scanId === 'scn_003'
+      filterFindings(findings, { ...defaults, scan: 'scan_120' }).all.every(
+        (finding) => finding.scanId === 'scan_120'
       )
     ).toBe(true)
   })
@@ -110,7 +110,7 @@ describe('readFilters', () => {
     expect(
       readFilters(
         new URLSearchParams(
-          'search=sql&severity=critical,high&status=open&page=2&category=A03%3A+Injection&target=tgt_001&direction=asc&sort=title&scan=scn_003'
+          'search=sql&severity=critical,high&status=open&page=2&category=A03%3A+Injection&target=tgt_01&direction=asc&sort=title&scan=scan_120'
         )
       )
     ).toMatchObject({
@@ -119,10 +119,10 @@ describe('readFilters', () => {
       status: ['open'],
       page: 2,
       category: ['A03: Injection'],
-      target: 'tgt_001',
+      target: 'tgt_01',
       direction: 'asc',
       sort: 'title',
-      scan: 'scn_003',
+      scan: 'scan_120',
     })
   })
   it.each(['page=-4', 'page=wat', 'page=0', 'direction=random', ''])(

@@ -152,7 +152,9 @@ export function GlobalModals() {
             >
               <TriangleAlert size={18} className="text-danger" aria-hidden="true" />
               <div>
-                <h3>{critical.length} {CONTENT.notifications.criticalAttention}</h3>
+                <h3>
+                  {critical.length} {CONTENT.notifications.criticalAttention}
+                </h3>
                 <p>{CONTENT.notifications.reviewCritical}</p>
               </div>
               <ArrowRight size={14} />
@@ -170,7 +172,10 @@ export function GlobalModals() {
               <ScanLine size={20} />
               <div>
                 <h3>
-                  {failedCount} {failedCount === 1 ? CONTENT.notifications.failedScan : CONTENT.notifications.failedScans}
+                  {failedCount}{' '}
+                  {failedCount === 1
+                    ? CONTENT.notifications.failedScan
+                    : CONTENT.notifications.failedScans}
                 </h3>
                 <p>{CONTENT.notifications.failedHelp}</p>
               </div>

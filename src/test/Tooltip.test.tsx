@@ -74,9 +74,11 @@ describe('shadcn-style navigation tooltips', () => {
     await userEvent.unhover(notifications)
     await userEvent.keyboard('{Escape}')
     await waitFor(() => expect(screen.queryByRole('tooltip')).not.toBeInTheDocument())
-    const edit = screen.getByRole('button', { name: 'Edit Customer application' })
+    const edit = screen.getByRole('button', { name: 'Edit target Customer application' })
     await userEvent.hover(edit)
-    expect(await screen.findByRole('tooltip')).toHaveTextContent('Edit Customer application')
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'Edit target: Customer application'
+    )
   })
 })
 

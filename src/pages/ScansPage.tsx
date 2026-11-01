@@ -127,7 +127,8 @@ export default function ScansPage() {
             </div>
             <div className="terminal">
               <div className="terminal-heading">
-                {CONTENT.scans.scannerOutput}<span className="mono">{CONTENT.scans.engine}</span>
+                {CONTENT.scans.scannerOutput}
+                <span className="mono">{CONTENT.scans.engine}</span>
               </div>
               <pre>{`[OK] ${CONTENT.scans.terminal.initialized}\n[OK] ${CONTENT.scans.terminal.authorized}\n${selected.progress > 10 ? `[OK] ${CONTENT.scans.terminal.discovered}\n` : ''}${selected.progress > 30 ? `[OK] ${CONTENT.scans.terminal.configuration}\n` : ''}${selected.progress > 55 ? `[OK] ${CONTENT.scans.terminal.owasp}\n` : ''}${selected.status === 'failed' ? `[ERROR] ${CONTENT.scans.terminal.failed}` : selected.status === 'completed' ? `[OK] ${CONTENT.scans.terminal.complete}` : selected.status === 'queued' ? `[WAIT] ${CONTENT.scans.terminal.waiting}` : `[RUN] ${CONTENT.scans.terminal.running}`}`}</pre>
             </div>

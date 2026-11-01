@@ -39,6 +39,18 @@ describe('Validated API boundary', () => {
     useAuthStore.getState().signOut()
     await expect(api('/targets', z.array(TargetSchema))).rejects.toThrow('session has expired')
   })
+  it('clears the session when the server returns 401', async () => {
+    server.use(
+      http.get('/api/targets', () =>
+        HttpResponse.json(
+          { error: 'Your session has expired. Please sign in again.' },
+          { status: 401 }
+        )
+      )
+    )
+    await expect(api('/targets', z.array(TargetSchema))).rejects.toThrow('session has expired')
+    expect(useAuthStore.getState().session).toBeNull()
+  })
   it('authenticates only the documented credentials', async () => {
     useAuthStore.getState().signOut()
     const body = LoginSchema.parse({ email: 'demo@example.com', password: 'password123' })
@@ -89,8 +101,13 @@ describe('Login and protected routing', () => {
         })
         return HttpResponse.json({
           token: 'mock-jwt-token-demo',
-          email: 'demo@example.com',
-          name: 'Alex Morgan',
+          user: {
+            id: '6d3b8a21-5f4c-4d1e-9a7b-2c8e0f1a3b5d',
+            name: 'Alex Morgan',
+            email: 'demo@example.com',
+            role: 'Security analyst',
+          },
+          workspaceId: 'c4f9d2a8-63b1-4d8f-9e5a-1a2b3c4d5e6f',
         })
       })
     )

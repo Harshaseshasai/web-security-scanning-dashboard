@@ -101,7 +101,9 @@ export function ScansTable({
                 <td>
                   {scan.status === 'completed' ? (
                     <div className="finding-counts">
-                      {counts.length === 0 && <span className="muted">0 {CONTENT.findings.findingsSuffix}</span>}
+                      {counts.length === 0 && (
+                        <span className="muted">0 {CONTENT.findings.findingsSuffix}</span>
+                      )}
                       {counts.map(([severity, count]) => (
                         <span key={severity} className={`scan-count ${severity}`}>
                           <strong>{count}</strong> {severity}

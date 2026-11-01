@@ -32,6 +32,12 @@ export async function api<T>(
     : await fetch(request)
   const json: unknown = await response.json()
   if (!response.ok) {
+    if (response.status === 401) {
+      useAuthStore.getState().signOut()
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        window.location.assign('/login')
+      }
+    }
     const parsed = ErrorSchema.safeParse(json)
     throw new Error(
       parsed.success ? parsed.data.error : `API ${response.status}: ${response.statusText}`

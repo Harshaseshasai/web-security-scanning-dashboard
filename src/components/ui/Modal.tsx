@@ -31,8 +31,11 @@ export function Modal({
       <Dialog.Portal>
         <Dialog.Overlay className="modal-overlay" />
         <Dialog.Content
+          tabIndex={-1}
           className={`modal-content ${wide ? 'modal-wide' : ''}`}
-          onOpenAutoFocus={() => {
+          onOpenAutoFocus={(event) => {
+            event.preventDefault()
+            document.querySelector<HTMLElement>('.modal-content[tabindex="-1"]')?.focus()
             returnFocus.current =
               document.activeElement instanceof HTMLElement ? document.activeElement : null
           }}

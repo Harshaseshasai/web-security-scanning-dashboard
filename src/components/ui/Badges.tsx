@@ -1,12 +1,4 @@
-import {
-  BadgeCheck,
-  Check,
-  CircleDot,
-  CircleOff,
-  Clock3,
-  LoaderCircle,
-  X,
-} from 'lucide-react'
+import { BadgeCheck, Check, CircleDot, CircleOff, Clock3, LoaderCircle, X } from 'lucide-react'
 import type { FindingStatus, Scan } from '../../types'
 import type { Severity } from '../../types'
 import { capitalize } from '../../lib/utils'
@@ -20,18 +12,22 @@ import {
 /** Maps a configured status mark to a visible, shape-distinct icon. */
 function StatusIcon({ mark, tone }: { mark: StatusMark; tone: StatusTone }) {
   if (mark === 'spinner') {
-    return <LoaderCircle className="status-spinner" size={15} aria-hidden="true" />
+    return (
+      <span className="status-mark">
+        <LoaderCircle className="status-spinner" size={15} aria-hidden="true" />
+      </span>
+    )
   }
   if (mark === 'check') {
     return (
-      <span className="status-disc status-disc-success">
+      <span className="status-mark status-disc status-disc-success">
         <Check size={11} strokeWidth={3} aria-hidden="true" />
       </span>
     )
   }
   if (mark === 'cross') {
     return (
-      <span className="status-disc status-disc-danger">
+      <span className="status-mark status-disc status-disc-danger">
         <X size={11} strokeWidth={3} aria-hidden="true" />
       </span>
     )
@@ -43,7 +39,11 @@ function StatusIcon({ mark, tone }: { mark: StatusMark; tone: StatusTone }) {
     slash: CircleOff,
   } as const
   const Icon = icons[mark]
-  return <Icon className={`status-glyph status-tone-${tone}`} size={15} aria-hidden="true" />
+  return (
+    <span className="status-mark">
+      <Icon className={`status-glyph status-tone-${tone}`} size={15} aria-hidden="true" />
+    </span>
+  )
 }
 
 /** Exposes the same configured finding mark for compact filter tabs. */
@@ -88,10 +88,18 @@ export function FindingStatusBadge({ status }: { status: FindingStatus }) {
 
 /** Backwards-compatible status switch for callers that already know the status family. */
 export function StatusBadge({ status }: { status: string }) {
-  if (status in SCAN_STATUS_CONFIG) return <ScanStatusBadge status={status as Scan['status']} />
-  if (status in FINDING_STATUS_CONFIG)
-    return <FindingStatusBadge status={status as FindingStatus} />
-  return <span className="status-badge">{capitalize(status)}</span>
+  const config =
+    status in SCAN_STATUS_CONFIG
+      ? SCAN_STATUS_CONFIG[status as keyof typeof SCAN_STATUS_CONFIG]
+      : status in FINDING_STATUS_CONFIG
+        ? FINDING_STATUS_CONFIG[status as keyof typeof FINDING_STATUS_CONFIG]
+        : undefined
+  return (
+    <span className={`status-badge status-badge-${status}`}>
+      <span className="status-mark" aria-hidden="true" />
+      {config?.label ?? capitalize(status)}
+    </span>
+  )
 }
 
 /** Names severity in text and pairs it with a high-contrast category rail. */

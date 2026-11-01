@@ -55,11 +55,7 @@ export function AppSidebar() {
         className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}
         aria-label={CONTENT.navigation.sidebarLabel}
       >
-        <IconHint
-          label={CONTENT.brand.homeLabel}
-          side="right"
-          enabled={iconOnly}
-        >
+        <IconHint label={CONTENT.brand.homeLabel} side="right" enabled={iconOnly}>
           <Link
             to="/dashboard"
             aria-label={CONTENT.brand.homeLabel}

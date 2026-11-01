@@ -23,7 +23,11 @@ export function AppShell() {
       <div className="app-body">
         <AppHeader />
         {fetching > 0 && (
-          <div className="refetch-indicator" role="status" aria-label={CONTENT.navigation.refreshing} />
+          <div
+            className="refetch-indicator"
+            role="status"
+            aria-label={CONTENT.navigation.refreshing}
+          />
         )}
         <main id="main" className="main-content" tabIndex={-1}>
           <div key={location.pathname} className="page-enter">
@@ -32,7 +36,8 @@ export function AppShell() {
           <footer className="app-footer">
             <span>{CONTENT.navigation.footer}</span>
             <span className="mono">
-              {CONTENT.brand.version}<span aria-hidden="true"> / </span>
+              {CONTENT.brand.version}
+              <span aria-hidden="true"> / </span>
               {CONTENT.navigation.demoEnvironment}
             </span>
           </footer>

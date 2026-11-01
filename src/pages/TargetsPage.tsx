@@ -7,6 +7,7 @@ import { Button } from '../components/ui/Button'
 import { EnvironmentBadge } from '../components/ui/Badges'
 import { EmptyState, ErrorState, TableSkeleton } from '../components/ui/DataState'
 import { Modal } from '../components/ui/Modal'
+import { Reveal } from '../components/ui/Reveal'
 import { IconHint } from '../components/ui/Tooltip'
 import { useTargets, useFindings } from '../hooks/use-data'
 import { useUiStore } from '../store/ui.store'
@@ -85,11 +86,17 @@ export default function TargetsPage() {
           }}
         >
           <option value="all">{CONTENT.targets.allEnvironments}</option>
-          {Object.entries(CONTENT.environments).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          {Object.entries(CONTENT.environments).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
         </select>
-        <span className="table-summary">{filtered.length} {CONTENT.targets.summary}</span>
+        <span className="table-summary">
+          {filtered.length} {CONTENT.targets.summary}
+        </span>
       </div>
-      <section className="panel">
+      <Reveal className="panel">
         {query.isLoading ? (
           <TableSkeleton rows={6} />
         ) : query.isError ? (
@@ -98,7 +105,9 @@ export default function TargetsPage() {
           <EmptyState
             title={search ? CONTENT.targets.noMatchTitle : CONTENT.targets.emptyTitle}
             description={CONTENT.targets.emptyDescription}
-            action={search || environment !== 'all' ? CONTENT.targets.clearFilters : CONTENT.targets.add}
+            action={
+              search || environment !== 'all' ? CONTENT.targets.clearFilters : CONTENT.targets.add
+            }
             onAction={() => {
               if (search || environment !== 'all') {
                 setSearch('')
@@ -199,13 +208,13 @@ export default function TargetsPage() {
             </table>
           </div>
         )}
-      </section>
+      </Reveal>
       <Modal
         open={deleting !== null}
         onClose={() => {
           if (!remove.isPending) setDeleting(null)
         }}
-        title={`${CONTENT.targets.remove} ${deleting?.name ?? ""}`.trim()}
+        title={`${CONTENT.targets.remove} ${deleting?.name ?? ''}`.trim()}
         description={CONTENT.targets.removeDescription}
       >
         {remove.isError && (

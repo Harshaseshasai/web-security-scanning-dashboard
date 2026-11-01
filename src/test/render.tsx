@@ -6,6 +6,7 @@ import { useAuthStore } from '../store/auth.store'
 import { useFindingStore } from '../store/findings-filter.store'
 import { useUiStore } from '../store/ui.store'
 import { SessionSchema } from '../schemas/auth.schema'
+import { DEMO_USER_ID, DEMO_WORKSPACE_ID } from '../mocks/identity'
 import { TooltipProvider } from '../components/ui/Tooltip'
 import { targets } from '../mocks/data/targets'
 import { scans } from '../mocks/data/scans'
@@ -35,8 +36,13 @@ export function resetStores() {
   useAuthStore.getState().signIn(
     SessionSchema.parse({
       token: 'mock-jwt-token-demo',
-      email: 'demo@example.com',
-      name: 'Alex Morgan',
+      user: {
+        id: DEMO_USER_ID,
+        name: 'Alex Morgan',
+        email: 'demo@example.com',
+        role: 'Security analyst',
+      },
+      workspaceId: DEMO_WORKSPACE_ID,
     })
   )
   useFindingStore.getState().reset()

@@ -1,5 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { LoginSchema, AuthConfigSchema, SessionSchema, WorkspaceSchema } from '../schemas/auth.schema'
+import {
+  LoginSchema,
+  AuthConfigSchema,
+  SessionSchema,
+  WorkspaceSchema,
+} from '../schemas/auth.schema'
 import { api } from '../lib/api'
 import { useAuthStore } from '../store/auth.store'
 import type { Login } from '../types'

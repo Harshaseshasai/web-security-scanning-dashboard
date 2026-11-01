@@ -81,7 +81,11 @@ export function FindingsChart({
           .replace('{resolved}', String(resolved))
           .replace('{days}', String(days))}
       >
-        <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 600, height: 200 }}>
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          initialDimension={{ width: 600, height: 200 }}
+        >
           <LineChart data={data} margin={{ top: 15, right: 13, left: -22, bottom: 5 }}>
             <CartesianGrid
               stroke="var(--muted-foreground)"
